@@ -1,5 +1,9 @@
 package ru.sber.nio
 
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
+
 /**
  * Реализовать простой аналог утилиты grep с использованием калссов из пакета java.nio.
  */
@@ -16,5 +20,28 @@ class Grep {
      */
     fun find(subString: String) {
 
+        val path = Paths.get("io\\logs");
+        val lists = Files.walk(path).filter { it.toString().endsWith(".log") };
+        var logs = "";
+
+        for (list in lists) {
+            val lines = Files.readAllLines(list);
+            var i = 1;
+            for (line in lines) {
+                if (line.indexOf(subString) != -1) {
+                    logs += "${list.fileName} : $i : $line\n";
+                    println("${list.fileName} : $i : $line")
+                }
+                i++;
+            }
+        }
+
+        Files.writeString(Paths.get("io\\result.txt"), logs, StandardOpenOption.CREATE);
+
     }
+}
+
+fun main() {
+    val grep = Grep();
+    grep.find("22/Jan/2001:14:27:46");
 }
