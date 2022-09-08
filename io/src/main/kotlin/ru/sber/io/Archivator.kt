@@ -14,7 +14,7 @@ class Archivator {
 
     /**
      * Метод, который архивирует файл logfile.log в архив logfile.zip.
-     * Архив должен располагаться в том же каталоге, что и исходной файл.
+     * Архив должен располагаться в том же каталоге, что и исходный файл.
      */
     fun zipLogfile(sourceFileName: String = "logfile.log", zipFileName: String = "logfile.zip", path: String = "io") {
         File("$path${File.separator}$sourceFileName").inputStream().use { fis ->
