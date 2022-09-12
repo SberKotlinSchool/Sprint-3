@@ -22,12 +22,15 @@ open class Room(val name: String, val size: Int) {
 //TODO: create class TownSquare here...
 open class TownSquare() : Room("Town Square", 1000) {
     final override fun load() = "Nothing much to see on Town Square"
-    override val dangerLevel: Int = 0
-        get() = field - 3
+
+    public override val dangerLevel: Int
+        get() = super.dangerLevel - 3
 }
 
-
-fun main() {
-    val room = Room("room1", 10)
-    println(room.load())
-}
+////testDrive
+//fun main() {
+//    val room = Room("room1", 10)
+//    val townSquare = TownSquare()
+//    println(townSquare.dangerLevel)
+//    println(room.load())
+//}

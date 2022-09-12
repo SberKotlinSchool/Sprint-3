@@ -6,7 +6,7 @@ interface Fightable {
     val powerType: String
     var healthPoints: Int
     val damageRoll: Int
-        get() = Random.nextInt(0, 7000)
+        get() = Random.nextInt(0, 700)
 
     fun attack(opponent: Fightable): Int
 }
@@ -23,27 +23,27 @@ class Goblin(
     override fun attack(opponent: Fightable): Int {
         val damage = damageRoll / 2
         println("Attacking opponent for $damage")
-        opponent.healthPoints -= damage
+        //opponent.healthPoints -= damage
         return damage
     }
 
 }
 
-abstract class Monster() : Fightable {
+abstract class Monster : Fightable {
     abstract val name: String
     abstract val description: String
 
     override fun attack(opponent: Fightable): Int {
         val damage = damageRoll
         println("Attacking opponent for $damage")
-        opponent.healthPoints -= damage
+        //opponent.healthPoints -= damage
         return damageRoll
     }
 
 }
 
 class Player(
-    val name: String,
+    private val name: String,
     private val isBlessed: Boolean,
     override val powerType: String,
     override var healthPoints: Int
@@ -57,15 +57,15 @@ class Player(
         }
 
         println("$name attacking opponent for $damage")
-        opponent.healthPoints -= damage
+        //opponent.healthPoints -= damage
         return damage
 
     }
 }
-
+//testDrive
 fun main() {
-    val player1 = Player("A1", true, "magic", 10000)
-    val player2 = Player("A2", false, "physic", 20000)
+    val player1 = Player("A1", true, "magic", 3000)
+    val player2 = Player("A2", false, "physic", 4000)
 
     println(player2.healthPoints)
     player1.attack(player2)
