@@ -1,11 +1,10 @@
 package ru.sber.nio
 
 import java.io.File
-import java.io.FileWriter
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.useLines
@@ -25,11 +24,13 @@ class Grep {
      * 22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
      */
     val resultFileName: String = "io/result.txt"
-    val logPath : String = "io/logs"
+    val logPath: String = "io/logs"
 
     fun find(subString: String) {
 
         val logPath = Paths.get(logPath)
+
+        deleteResultFile()
         Files.walk(logPath).forEach { file ->
             if (file.isRegularFile()) {
                 val findRecords = getStrFromFile(file, subString)
@@ -44,7 +45,7 @@ class Grep {
 
     private fun getStrFromFile(file: Path, subString: String): List<String> {
         val resultList: MutableList<String> = mutableListOf()
-        return file.useLines { fileContent ->
+        file.useLines { fileContent ->
 
             fileContent.forEachIndexed() { strIndex, fileStr ->
                 if (fileStr.contains(subString)) {
@@ -59,7 +60,7 @@ class Grep {
     private fun saveDataToFile(data: List<String>) {
         try {
             data.forEach { str ->
-                File("$resultFileName").appendText(str + "\n")
+                File(resultFileName).appendText(str + "\n")
                 //println("Results success saved into $resultFileName")
             }
         } catch (e: Exception) {
@@ -67,9 +68,23 @@ class Grep {
         }
 
     }
-}
 
-fun main() {
-    val gr = Grep()
-    gr.find("22/Jan/2001:14:27:46")
+    private fun deleteResultFile() {
+        val resultFile = File(resultFileName)
+        try {
+            if (resultFile.exists()) {
+                resultFile.delete()
+            }
+        } catch (e: IOException) {
+            println("Error while deleting previous results")
+        }
+
+    }
+
+
 }
+//testDrive
+//fun main() {
+//    val gr = Grep()
+//    gr.find("22/Jan/2001:14:27:46")
+//}
