@@ -24,40 +24,52 @@ class Grep {
      * Пример для подстроки "22/Jan/2001:14:27:46":
      * 22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
      */
+    val resultFileName: String = "io/result.txt"
+    val logPath : String = "io/logs"
+
     fun find(subString: String) {
 
-        val logPath = Paths.get("io/logs")
+        val logPath = Paths.get(logPath)
         Files.walk(logPath).forEach { file ->
             if (file.isRegularFile()) {
                 val findRecords = getStrFromFile(file, subString)
-                //println("${file.name} === $findRecords")
+                //println("fileDir === ${file.parent} === $findRecords")
                 if (findRecords.isNotEmpty()) {
                     saveDataToFile(findRecords)
-                    println(file.parent)
                 }
             }
         }
+        println("Searching success, results can be found in $resultFileName")
     }
 
     private fun getStrFromFile(file: Path, subString: String): List<String> {
-        return file.useLines { fileStr ->
-            fileStr.filter { str ->
-                str.contains(subString)
-            }.toList()
+        val resultList: MutableList<String> = mutableListOf()
+        return file.useLines { fileContent ->
+
+            fileContent.forEachIndexed() { strIndex, fileStr ->
+                if (fileStr.contains(subString)) {
+                    resultList.add("${file.name} : ${strIndex + 1} : ${fileStr}")
+                    //println("${file.name} : $index : ${str}")
+                }
+            }
+            return resultList.toList()
         }
     }
 
     private fun saveDataToFile(data: List<String>) {
-        FileWriter("result").use { fw ->
+        try {
             data.forEach { str ->
-                //fw.write("$str/n")
-                File("result111").appendText(str + "\n")
+                File("$resultFileName").appendText(str + "\n")
+                //println("Results success saved into $resultFileName")
             }
+        } catch (e: Exception) {
+            println("Some errors while writing result ${e.message}")
         }
+
     }
 }
 
 fun main() {
     val gr = Grep()
-    gr.find("127.0.0.1")
+    gr.find("22/Jan/2001:14:27:46")
 }

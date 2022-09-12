@@ -17,7 +17,10 @@ import java.util.zip.ZipOutputStream
  */
 class Archivator {
 
-    val archivedLogFile: File = File("logfile.zip")
+
+    private val logFile = File("io/logfile.log ")
+    private val archivedLogFile: File = File("io/logfile.zip")
+    private val unzippedLogfile = File("io/unzippedLogfile.log")
     private val readBuffer = ByteArray(1024)
 
     /**
@@ -25,8 +28,6 @@ class Archivator {
      * Архив должен располагаться в том же каталоге, что и исходной файл.
      */
     fun zipLogfile() {
-
-        val logFile = File("logfile.log ")
 
         try {
             println("Start creating archive for ${logFile.path}")
@@ -41,11 +42,12 @@ class Archivator {
                     } while (fis.read() != -1)
                 }
             }
+            println("Archive ${archivedLogFile.name} create successful.")
 
         } catch (e: IOException) {
             println("Error while creating archive ${e.message}")
         }
-        println("Archive ${archivedLogFile.name} create successful.")
+
     }
 
     /**
@@ -54,8 +56,8 @@ class Archivator {
      */
     fun unzipLogfile() {
 
+
         println("Start unarchive ${archivedLogFile.path}")
-        val unzippedLogfile = File("unzippedLogfile.log")
 
         try {
             ZipInputStream(FileInputStream(archivedLogFile)).use { zis ->
@@ -64,17 +66,18 @@ class Archivator {
                     zis.nextEntry
                 }
                 zis.closeEntry()
+                println("Success unarchive ${archivedLogFile.name} to ${unzippedLogfile.path}")
             }
         } catch (e: IOException) {
             println("Error while unzip $archivedLogFile ${e.message}")
         }
-        println("Success unarchive ${archivedLogFile.name} to ${unzippedLogfile.path}")
+
     }
 }
-
-fun main() {
-    val arch = Archivator()
-    arch.zipLogfile()
-    println("================================")
-    arch.unzipLogfile()
-}
+//testDrive
+//fun main() {
+//    val arch = Archivator()
+//    arch.zipLogfile()
+//    println("================================")
+//    arch.unzipLogfile()
+//}
