@@ -23,7 +23,7 @@ class Goblin(
     override fun attack(opponent: Fightable): Int {
         val damage = damageRoll / 2
         println("Attacking opponent for $damage")
-        //opponent.healthPoints -= damage
+        opponent.healthPoints -= damage
         return damage
     }
 
@@ -36,7 +36,7 @@ abstract class Monster : Fightable {
     override fun attack(opponent: Fightable): Int {
         val damage = damageRoll
         println("Attacking opponent for $damage")
-        //opponent.healthPoints -= damage
+        opponent.healthPoints -= damage
         return damageRoll
     }
 
@@ -57,7 +57,7 @@ class Player(
         }
 
         println("$name attacking opponent for $damage")
-        //opponent.healthPoints -= damage
+        opponent.healthPoints -= damage
         return damage
 
     }

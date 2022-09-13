@@ -47,7 +47,6 @@ class Archivator {
         } catch (e: IOException) {
             println("Error while creating archive ${e.message}")
         }
-
     }
 
     /**
@@ -55,7 +54,6 @@ class Archivator {
      * Извлечь из архива logfile.zip файл и сохарнить его в том же каталоге с именем unzippedLogfile.log
      */
     fun unzipLogfile() {
-
 
         println("Start unarchive ${archivedLogFile.path}")
 
@@ -71,7 +69,6 @@ class Archivator {
         } catch (e: IOException) {
             println("Error while unzip $archivedLogFile ${e.message}")
         }
-
     }
 }
 //testDrive

@@ -45,6 +45,7 @@ class Grep {
 
     private fun getStrFromFile(file: Path, subString: String): List<String> {
         val resultList: MutableList<String> = mutableListOf()
+
         file.useLines { fileContent ->
 
             fileContent.forEachIndexed() { strIndex, fileStr ->
