@@ -4,9 +4,11 @@ import io.mockk.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.DisplayName
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 
+@DisplayName("HrDepartment class test cases")
 internal class HrDepartmentTest {
 
     private val hrDepartment = HrDepartment
