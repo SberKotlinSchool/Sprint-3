@@ -15,7 +15,6 @@ open class Room(val name: String, val size: Int) {
 
 }
 
-//TODO: create class TownSquare here...
 class TownSquare: Room("Town Square", 1000){
     final override fun load(): String {return "there is something to see on Town Square"}
     override val dangerLevel = super.dangerLevel -3
