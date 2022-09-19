@@ -3,6 +3,9 @@ package ru.sber.oop
 data class User(val name: String, val age: Long) {
     lateinit var city: String
 
+    /**
+     * Метод для переопределения equals
+     */
     override fun equals(other: Any?): Boolean {
         return (other is User)
                 && this.name == other.name
@@ -10,6 +13,9 @@ data class User(val name: String, val age: Long) {
                 && this.city == other.city
     }
 
+    /**
+     * Метод для переопределения hashCode
+     */
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + age.hashCode()
@@ -18,6 +24,7 @@ data class User(val name: String, val age: Long) {
     }
 
 }
+
 //testDrive
 //fun main() {
 //    val user1 = User("Alex", 13)

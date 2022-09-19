@@ -64,10 +64,20 @@ internal class HrDepartmentTest {
         }
     }
 
-//    @Test
-//    fun `HrDepartment processNextRequest() test` () {
-//        mockkObject(LinkedList<CertificateRequest>().poll())
-//        every { LinkedList<CertificateRequest>().poll() } returns certificateRequestNdfl
-//    }
+    @Test
+    fun `HrDepartment processNextRequest() test with mocks`() {
+        //TODO("Возможно есть какая возможнось мокировать private fields в классе, но пока не разобрался, было бы сильно красивее")
+
+        mockkStatic(LocalDateTime::class)
+        mockkObject(certificateRequestNdfl)
+        every { LocalDateTime.now(HrDepartment.clock).dayOfWeek } returns workDayForNdflRequest
+        every { certificateRequestNdfl.process(employeeNumber) } returns Certificate(
+            certificateRequestNdfl, employeeNumber,
+            byteArrayOf(100)
+        )
+        hrDepartment.receiveRequest(certificateRequestNdfl)
+        assertDoesNotThrow { HrDepartment.processNextRequest(employeeNumber) }
+        verify { certificateRequestNdfl.process(employeeNumber) }
+    }
 
 }

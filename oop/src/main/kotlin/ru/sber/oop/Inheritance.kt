@@ -5,12 +5,22 @@ open class Room(val name: String, val size: Int) {
     protected open val dangerLevel = 5
     private val monster: Monster = Goblin(name = "Goblin Petya", powerType = "Physic", healthPoints = 500)
 
+    /**
+     * Функция расширения для класса Monster.
+     * Научим монстров приветсвовать оппонентов.
+     */
     private fun Monster.getSalutation(): String {
         return "Monster $name, salutation to you :)"
     }
 
+    /**
+     * Метод для получения описания комнаты.
+     */
     fun description() = "Room: $name"
 
+    /**
+     * Метод для загрузки комнаты.
+     */
     open fun load() = "Nothing much to see here...\n ${monster.getSalutation()}"
 
     constructor(_name: String) : this(_name, 100) {
