@@ -13,7 +13,7 @@ data class User(val name: String, val age: Long) {
 fun User.eqFields(other: User) : Boolean {
     val (name1, age1) = this
     val (name2, age2) = other
-    return name1.equals(name2) && age1.equals(age2) && this.city.equals(other.city)
+    return name1 == name2 && age1 == age2 && this.city == other.city
 }
 
 fun main() {
@@ -24,5 +24,5 @@ fun main() {
     user1.city="Omsk"
     val user3=user1.copy()
     user3.city="Tomsk"
-    println("user3${if (user1.equals(user3)) " " else " not "}equals user1")
+    println("user3${if (user1 == user3) " " else " not "}equals user1")
 }
