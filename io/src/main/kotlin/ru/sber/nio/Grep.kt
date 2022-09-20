@@ -1,5 +1,6 @@
 package ru.sber.nio
 
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -14,9 +15,16 @@ import kotlin.streams.toList
 /**
  * Реализовать простой аналог утилиты grep с использованием калссов из пакета java.nio.
  */
-class Grep {
-    private val folder: Path = Paths.get("logs")
-    private val resultFile: Path = Paths.get("result.txt")
+class Grep(folderName: String) {
+
+    private val folder: Path
+    private val resultFile: Path
+
+    init {
+        folder = Paths.get(folderName)
+        val resultFileName = if (folder.parent != null) "${folder.parent}${File.separator}result.txt" else "result.txt"
+        resultFile = Paths.get(resultFileName)
+    }
 
     /**
      * Метод должен выполнить поиск подстроки subString во всех файлах каталога logs.
