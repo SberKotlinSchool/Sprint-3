@@ -1,26 +1,42 @@
 package ru.sber.qa
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import kotlin.random.Random
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 internal class ScannerTest {
 
-    private val mockScanner = spyk<Scanner>()
+    @BeforeEach
+    internal fun setUp() {
+        mockkObject(Random.Default)
+    }
+
+    @AfterEach
+    internal fun tearDown() {
+        unmockkAll()
+    }
+
+    @Test
+    fun `getScanData with ScanTimeoutException`() {
+
+        every { Random.nextLong(any(), any()) } returns Scanner.SCAN_TIMEOUT_THRESHOLD + 1
+
+        assertFailsWith<ScanTimeoutException> { Scanner.getScanData() }
+    }
 
     @Test
     fun getScanData() {
-        mockkStatic(Random::class) {
+        every { Random.nextLong(any(), any()) } returns 1L
+        val scanData = Scanner.getScanData()
 
-            every { Random.nextLong() } returns 1
-
-            val scanData = mockScanner.getScanData()
-
-            assertNotNull(scanData)
-        }
-
-
+        assertNotNull(scanData)
+        verify { Random.nextBytes(100) }
     }
 }
