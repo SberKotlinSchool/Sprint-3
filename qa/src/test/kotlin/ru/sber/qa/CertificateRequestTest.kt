@@ -1,24 +1,21 @@
 package ru.sber.qa
 
+import io.mockk.every
+import io.mockk.mockkObject
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
-import java.util.stream.Stream
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
 
 internal class CertificateRequestTest {
-    private fun provideProcess() = Stream.of(
-        Arguments.of(Certificate)
-    )
 
-    @ParameterizedTest
-    @MethodSource("provideProcess")
-    fun processTest(expected: Certificate, employeeNumber: Long, certificateType: CertificateType) {
-        val certificateRequest = CertificateRequest(employeeNumber, certificateType)
-        val actual = certificateRequest.process(employeeNumber)
+    @Test
+    fun `simple process test`() {
+        val certificateRequest = CertificateRequest(1, CertificateType.NDFL)
+        mockkObject(Scanner)
+        every { Scanner.getScanData() } returns ByteArray(1)
+        val actual = certificateRequest.process(2)
 
-        assertEquals(expected, actual)
+        assertNotNull(actual)
+        assertEquals(certificateRequest, actual.certificateRequest)
     }
-
-    fun
 }
