@@ -1,13 +1,17 @@
 package ru.sber.oop
 
-class Room(val name: String, val size: Int) {
+open class Room(val name: String, val size: Int) {
 
-    val dangerLevel = 5
+    protected open val dangerLevel = 5
 
     fun description() = "Room: $name"
 
-    fun load() = "Nothing much to see here..."
+    open fun load() = "Nothing much to see here..."
 
 }
 
-//TODO: create class TownSquare here...
+class TownSquare(name:  String) : Room(name, 1000){
+    override fun load() = "parents must be open"
+    override val dangerLevel: Int
+        get() = super.dangerLevel - 3
+}
