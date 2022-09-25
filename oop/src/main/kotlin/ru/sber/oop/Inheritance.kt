@@ -11,10 +11,10 @@ package ru.sber.oop
  */
 open class Room(val name: String, val size: Int) {
 
-    //Добавьте в класс ru.sber.oop.Room поле типа Monster и инициализируйте его экземпляром класса Goblin.
-    var monster: Monster = Goblin("","")
-
     constructor() : this("Room", 100)
+
+    //Добавьте в класс ru.sber.oop.Room поле типа Monster и инициализируйте его экземпляром класса Goblin.
+    private var monster: Monster = Goblin("BigBoss", 1000, "Goblin 1", "Main Goblin")
 
     protected open val dangerLevel = 5
 
@@ -29,7 +29,7 @@ class TownSquare() : Room("Town Square", 1000) {
     override val dangerLevel: Int
         get() = super.dangerLevel - 3
 
-    override fun load(): String = "load in Town Square"
+    final override fun load(): String = "load in Town Square"
 }
 
 /*

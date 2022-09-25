@@ -20,10 +20,7 @@ import kotlin.random.Random
 
 interface Fightable {
     val powerType: String
-        get() = ""
     var healthPoints: Int
-        get() = 0
-        set(value) {}
 
     //Добавьте метод чтения по умолчанию для поля damageRoll, которое возвращает радномное число.
     val damageRoll: Int
@@ -38,7 +35,12 @@ interface Fightable {
        и удвоенный damageRoll, если isBlessed = true.
        Результат функции attack - количество урона, которое нанес объект класса Player.
  */
-class Player(val name: String, val isBlessed: Boolean) : Fightable {
+class Player(
+    override val powerType: String,
+    override var healthPoints: Int,
+    val name: String,
+    val isBlessed: Boolean
+) : Fightable {
 
     override fun attack(opponent: Fightable): Int {
         val totalDamage = damageRoll * if (isBlessed) 2 else 1
@@ -68,7 +70,12 @@ abstract class Monster(val name: String, val description: String) : Fightable {
     Реализуйте наследника класса Monster - класс Goblin.
     Переопределите в нем метод чтения damageRoll (допустим, он в два раза меньше сгененрированного рандомного значения).
  */
-class Goblin(name: String, description: String) : Monster(name, description) {
+class Goblin(
+    override val powerType: String,
+    override var healthPoints: Int,
+    name: String,
+    description: String
+) : Monster(name, description) {
     override val damageRoll: Int
         get() = super.damageRoll / 2
 }
