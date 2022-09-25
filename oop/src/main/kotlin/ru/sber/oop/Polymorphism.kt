@@ -14,9 +14,10 @@ interface Fightable {
 
 //TODO: create class Player, Monster, Goblin here...
 class Player(override val powerType: String,
-             override var healthPoints: Int, _name: String, _isBlessed: Boolean): Fightable {
-    val name = _name
-    val isBlessed = _isBlessed
+             override var healthPoints: Int,
+             val name: String,
+             private val isBlessed: Boolean): Fightable {
+
 
     override fun attack(opponent: Fightable): Int {
         val damage = damageRoll
