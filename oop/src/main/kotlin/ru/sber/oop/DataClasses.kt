@@ -9,9 +9,17 @@ data class User(val name: String, val age: Long) {
         val castedObject = other as? User
 
         return (this.age == castedObject?.age &&
-                this.name == castedObject?.city &&
-                this.city == castedObject?.city
+                this.name == castedObject.name &&
+                this.city == castedObject.city
                 )
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + age.hashCode()
+        result = 31 * result + city.hashCode()
+
+        return result
     }
 }
 
@@ -25,4 +33,5 @@ fun main() {
     user3.city = "Tomsk"
 
     println(user1 == user3)
+    println(user1.hashCode() == user3.hashCode())
 }
