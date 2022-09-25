@@ -10,8 +10,8 @@ import java.nio.file.Paths
 internal class ArchivatorTest {
 
     private val archivator: Archivator = Archivator()
-    private val expectedZip: File = File("src/test/resources/io.zip/logfile.zip")
-    private val expectedUnZip: File = File("src/test/resources/io.unzip/unzippedLogfile.log")
+    private val expectedZip: File = File("./src/test/resources/io.zip/logfile.zip")
+    private val expectedUnZip: File = File("./src/test/resources/io.unzip/unzippedLogfile.log")
 
     @BeforeEach
     internal fun setUp() {
@@ -33,7 +33,7 @@ internal class ArchivatorTest {
 
     @Test
     fun zipLogfile() {
-        val file = Paths.get("src/test/resources/io.zip/logfile.log").toFile()
+        val file = Paths.get("./src/test/resources/io.zip/logfile.log").toFile()
 
         archivator.zipLogfile(file)
 
@@ -43,7 +43,7 @@ internal class ArchivatorTest {
 
     @Test
     fun unzipLogfile() {
-        val file = Paths.get("src/test/resources/io.unzip/logfile.zip").toFile()
+        val file = Paths.get("./src/test/resources/io.unzip/logfile.zip").toFile()
 
         archivator.unzipLogfile(file)
 

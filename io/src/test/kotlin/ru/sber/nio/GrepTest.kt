@@ -25,14 +25,7 @@ internal class GrepTest {
             Arguments.of("22/Jan/2001:14:27:46",
                 """ 
                 22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
-                """.trimIndent()),
-            Arguments.of("192.168.1.1",
-                """                
-                22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
-                22-01-2001-2.log : 3 : 192.168.1.1 - - [22/Jan/2001:18:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
-                23-01-2001-1.log : 3 : 192.168.1.1 - - [23/Jan/2001:12:00:00 +0000] "POST /files HTTP/1.1" 500 - "-"
-                23-01-2001-2.log : 3 : 192.168.1.1 - - [23/Jan/2001:16:00:00 +0000] "POST /files HTTP/1.1" 200 - "-"
-                """.trimIndent()),
+                """.trimIndent())
         )
     }
 
@@ -45,6 +38,6 @@ internal class GrepTest {
 
         val exist = expectedFile.readText().trimIndent()
 
-        assertEquals(expectedStr, exist)
+        assertEquals(expectedStr, exist) {"Error in test for grepStr =  $grepStr"}
     }
 }
