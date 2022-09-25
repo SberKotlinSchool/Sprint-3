@@ -13,6 +13,14 @@ object HrDepartment {
     private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
     private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
 
+    fun getIncomeBox(): LinkedList<CertificateRequest> {
+        return incomeBox
+    }
+
+    fun getOutcomeOutcome(): LinkedList<Certificate> {
+        return outcomeOutcome
+    }
+
     /**
      * Получение запроса на изготовление справки.
      *
