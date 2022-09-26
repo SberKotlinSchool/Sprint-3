@@ -2,15 +2,24 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class HrDepartmentTest {
     private val hrDepartment = HrDepartment
+
+    @AfterAll
+    fun unmock(){
+        unmockkAll()
+    }
 
     @Test
     fun `positive receiveRequest Test`() {
