@@ -37,6 +37,7 @@ interface Fightable {
             opponent.healthPoints -= damageRoll
             return damageRoll
         }
+        fun getSalutation(): String = "Hello, Monster"
     }
 
     class Goblin(

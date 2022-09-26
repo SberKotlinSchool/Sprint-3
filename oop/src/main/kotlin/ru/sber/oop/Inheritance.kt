@@ -8,7 +8,6 @@ open class Room(val name: String, val size: Int) {
 
     fun description() = "Room: $name"
 
-    private fun Fightable.Monster.getSalutation(): String = "Hello, Monster"
     open fun load() = monster.getSalutation()
 
     private val monster : Fightable.Monster = Fightable.Goblin("Cute",100,"Cat","Cartoon Cat")
