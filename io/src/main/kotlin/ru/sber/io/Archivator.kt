@@ -1,9 +1,6 @@
 package ru.sber.io
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
@@ -18,7 +15,7 @@ import java.util.zip.ZipOutputStream
 class Archivator {
 
 
-    private val logFile = File("io/logfile.log ")
+    private val logFile = File("io/logfile.log")
     private val archivedLogFile: File = File("io/logfile.zip")
     private val unzippedLogfile = File("io/unzippedLogfile.log")
     private val readBuffer = ByteArray(1024)
@@ -27,19 +24,24 @@ class Archivator {
      * Метод, который архивирует файл logfile.log в архив logfile.zip.
      * Архив должен располагаться в том же каталоге, что и исходной файл.
      */
-    fun zipLogfile() {
+    fun zipLogFile() {
 
         try {
             println("Start creating archive for ${logFile.path}")
+            ZipOutputStream(BufferedOutputStream(FileOutputStream(archivedLogFile))).use { zos ->
 
-            ZipOutputStream(FileOutputStream(archivedLogFile)).use { zos ->
-                zos.putNextEntry(ZipEntry(logFile.name))
                 FileInputStream(logFile).use { fis ->
-
-                    do {
-                        fis.read(readBuffer)
-                        zos.write(readBuffer)
-                    } while (fis.read() != -1)
+                    BufferedInputStream(fis).use { bis ->
+                        val entry = ZipEntry(logFile.name)
+                        zos.putNextEntry(entry)
+                        while (true) {
+                            val readBytes = bis.read(readBuffer)
+                            if (readBytes == -1) {
+                                break
+                            }
+                            zos.write(readBuffer, 0, readBytes)
+                        }
+                    }
                 }
             }
             println("Archive ${archivedLogFile.name} create successful.")
@@ -75,7 +77,7 @@ class Archivator {
 //testDrive
 //fun main() {
 //    val arch = Archivator()
-//    arch.zipLogfile()
+//    arch.zipLogFile()
 //    println("================================")
 //    arch.unzipLogfile()
 //}
