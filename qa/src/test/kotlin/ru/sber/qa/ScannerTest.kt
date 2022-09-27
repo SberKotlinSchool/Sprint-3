@@ -32,19 +32,5 @@ internal class ScannerTest {
         assertNotNull(resultScan, "result of getScanData is not null check")
         assertEquals(expectedDataSize, resultScan.size, "data size check")
     }
-
-    @Test
-    fun `Scanner getScanData() test without mocks`() {
-
-        try {
-
-            val resultScan = Scanner.getScanData()
-            assertNotNull(resultScan, "result of getScanData is not null check")
-            assertEquals(expectedDataSize, resultScan.size, "data size check")
-
-        } catch (e: ScanTimeoutException) {
-            assertEquals(e.message, "Таймаут сканирования документа", "Exception check")
-        }
-    }
 }
 

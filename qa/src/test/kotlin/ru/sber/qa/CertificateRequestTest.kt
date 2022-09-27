@@ -1,8 +1,9 @@
 package ru.sber.qa
 
-import io.mockk.every
-import io.mockk.mockkObject
+import io.mockk.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -11,9 +12,13 @@ internal class CertificateRequestTest {
 
     private val expectedDataSize: Int = 100
 
+    @BeforeEach
+    fun mockScanner() {
+        mockkObject(Scanner)
+    }
+
     @Test
     fun `CertificateRequest process() test with LABOUR_BOOK type with mock without exception`() {
-        mockkObject(Scanner)
         every { Scanner.getScanData() } returns ByteArray(100)
         val employeeNumber: Long = 252
         val certificateRequest = CertificateRequest(employeeNumber, CertificateType.LABOUR_BOOK)
@@ -21,7 +26,13 @@ internal class CertificateRequestTest {
         assertAll(
             "Certificate",
             { assertNotNull(certificateWithLabourBook, "Certificate not null check") },
-            { assertEquals(certificateWithLabourBook.certificateRequest, certificateRequest,"Certificate request check")},
+            {
+                assertEquals(
+                    certificateWithLabourBook.certificateRequest,
+                    certificateRequest,
+                    "Certificate request check"
+                )
+            },
             { assertEquals(certificateWithLabourBook.processedBy, employeeNumber, "Certificate processBy check") },
             { assertEquals(certificateWithLabourBook.data.size, expectedDataSize, "Certificate data size check") }
         )
@@ -30,7 +41,6 @@ internal class CertificateRequestTest {
 
     @Test
     fun `CertificateRequest process() test with LABOUR_BOOK type with mock and timeout exception`() {
-        mockkObject(Scanner)
         every { Scanner.getScanData() } throws ScanTimeoutException()
         val employeeNumber: Long = 252
         val certificateRequest = CertificateRequest(employeeNumber, CertificateType.LABOUR_BOOK)
@@ -41,10 +51,7 @@ internal class CertificateRequestTest {
 
     @Test
     fun `CertificateRequest process() test with NFDL type with mock without exception`() {
-
-        mockkObject(Scanner)
         every { Scanner.getScanData() } returns ByteArray(100)
-
         val employeeNumber: Long = 251
         val certificateRequest = CertificateRequest(employeeNumber, CertificateType.NDFL)
         val certificateWithNfl = certificateRequest.process(employeeNumber)
@@ -59,13 +66,17 @@ internal class CertificateRequestTest {
 
     @Test
     fun `CertificateRequest process() test with NFDL type with mock and timeout exception`() {
-        mockkObject(Scanner)
         every { Scanner.getScanData() } throws ScanTimeoutException()
         val employeeNumber: Long = 252
         val certificateRequest = CertificateRequest(employeeNumber, CertificateType.NDFL)
         assertThrows(ScanTimeoutException::class.java) {
             certificateRequest.process(employeeNumber)
         }
+    }
+
+    @AfterEach
+    fun unlockAllScanner() {
+        unmockkAll()
     }
 
 //@deprecated
