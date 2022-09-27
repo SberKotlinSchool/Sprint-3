@@ -24,7 +24,7 @@ open class Room(val name: String, val size: Int) {
 
 }
 
-class TownSquare() : Room("Town Square", 1000) {
+open class TownSquare() : Room("Town Square", 1000) {
 
     override val dangerLevel: Int
         get() = super.dangerLevel - 3
