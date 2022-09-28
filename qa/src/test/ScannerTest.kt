@@ -1,5 +1,3 @@
-package src.main.kotlin.ru.sber.qa
-
 import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

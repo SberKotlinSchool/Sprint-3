@@ -1,22 +1,17 @@
-package src.main.kotlin.ru.sber.qa
-
 import io.mockk.*
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import ru.sber.qa.*
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.util.*
 
 internal class HrDepartmentTest {
     val mockedLocalDateTime = mockkStatic(LocalDateTime::class)
     private val mockedCertificateRequest = mockk<CertificateRequest>()
-//    private val spy = spyk<HrDepartment>(recordPrivateCalls = true)
     val mockCertificate = mockk<Certificate>()
-    private val hrDepartment = HrDepartment
+    private val hrDepartment = spyk<HrDepartment>()
 
     @ParameterizedTest()
     @ValueSource(ints = [6,7]) // Sunday - 6, Saturday - 7
@@ -78,26 +73,18 @@ internal class HrDepartmentTest {
         }
     }
 
-    //с моками получается как то так, не понял, как очереди замокать полностью
     @Test
     fun processNextRequest() {
-        val hrEmployee = 99999L
+        val hrEployee = 9999L
+        val certificate = Certificate(mockedCertificateRequest,
+            hrEployee, byteArrayOf(100)
+        )
 
-        every { mockedCertificateRequest.process(hrEmployee) } returns
-                Certificate(mockedCertificateRequest,
-                    hrEmployee,
-                    byteArrayOf(100)
-                )
-        every { LocalDateTime.now(HrDepartment.clock).dayOfWeek } returns DayOfWeek.TUESDAY
+        every { mockedCertificateRequest.process(hrEployee) } returns certificate
 
-        every { mockedCertificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
+        hrDepartment.getIncomeBox().push(mockedCertificateRequest)
+        hrDepartment.processNextRequest(hrEployee)
 
-        hrDepartment.receiveRequest(mockedCertificateRequest)
-        hrDepartment.processNextRequest(hrEmployee)
-
-        verify(exactly = 1) { mockedCertificateRequest.process(hrEmployee) }
-
-        assertTrue(hrDepartment.getIncomeBox().isEmpty())
-        assertTrue(hrDepartment.getOutcomeOutcome().isNotEmpty())
+        assertEquals(hrDepartment.getOutcomeOutcome().poll(), certificate)
     }
 }
