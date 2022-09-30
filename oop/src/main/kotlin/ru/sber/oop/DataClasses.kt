@@ -7,6 +7,10 @@ data class User(val name: String, val age: Long) {
         is User -> super.equals(other) && this.city.equals(other.city)
         else -> super.equals(other)
     }
+
+    override fun hashCode(): Int {
+        return super.hashCode() + city.hashCode()
+    }
 }
 
 fun main() {
