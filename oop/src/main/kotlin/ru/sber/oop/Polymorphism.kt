@@ -20,12 +20,12 @@ class Player(
 ) : Fightable {
 
     override fun attack(opponent: Fightable): Int {
-        val damage = damageRoll * if (isBlessed) 2 else 1
+        val attackDamage = damageRoll * if (isBlessed) 2 else 1
+        val opponentDamage = min(opponent.healthPoints, attackDamage)
 
-        opponent.healthPoints - damage
+        opponent.healthPoints -= opponentDamage
 
-        // Мы же не можем нанести больше урона, чем есть здоровья у врага
-        return min(opponent.healthPoints, damage)
+        return opponentDamage
     }
 }
 
@@ -35,8 +35,11 @@ abstract class Monster(
 ): Fightable {
 
     override fun attack(opponent: Fightable): Int {
-        opponent.healthPoints - damageRoll
-        return min(opponent.healthPoints, damageRoll)
+        val opponentDamage = min(opponent.healthPoints, damageRoll)
+
+        opponent.healthPoints -= opponentDamage
+
+        return opponentDamage
     }
 }
 
