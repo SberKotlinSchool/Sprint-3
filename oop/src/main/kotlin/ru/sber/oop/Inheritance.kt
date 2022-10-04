@@ -17,8 +17,11 @@ open class Room(
 }
 
 open class TownSquare : Room("Town Square", 1000) {
-
     override val dangerLevel = 2
+
+    override fun load() {
+        super.load()
+    }
 }
 
 fun Monster.getSalutation() = "Hello, my little boya..."
