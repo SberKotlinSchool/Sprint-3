@@ -19,7 +19,7 @@ open class Room(val name: String,
 
     protected open val dangerLevel = 5
     fun description() = "Room: $name"
-    open fun load() = monster.getSalutation(name)
+    open fun load() = monster.getSalutation()
 }
 
 open class TownSquare(): Room("Town Square", 1000) {

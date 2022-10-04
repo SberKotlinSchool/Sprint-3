@@ -45,8 +45,8 @@ class Player(
 
 //Реализуйте абстрактный класс Monster, имплементирующий интерфейс ru.sber.oop.Fightable со строковыми полями name и description.
 abstract class Monster(
-    name: String,
-    description: String
+    val name: String,
+    val description: String
     ): Fightable {
 
     override fun attack(opponent: Fightable): Int = damageRoll
@@ -61,7 +61,7 @@ class Goblin(override val powerType: String,
         get() = super.damageRoll/2
 }
 
-fun Monster.getSalutation(name: String): String = "Привет $name"
+fun Monster.getSalutation(): String = "Привет ${this.name}"
 
 
 
