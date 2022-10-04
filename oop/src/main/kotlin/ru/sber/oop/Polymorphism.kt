@@ -25,7 +25,7 @@ class Player(
     }
 }
 
-open class Monster(
+abstract class Monster(
     override val powerType: String,
     override var healthPoints: Int,
     override val name : String,
