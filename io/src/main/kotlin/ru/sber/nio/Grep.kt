@@ -14,7 +14,10 @@ class Grep {
      * Пример для подстроки "22/Jan/2001:14:27:46":
      * 22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
      */
-    fun find(subString: String) {
+    companion object {
+        @JvmStatic
+        fun find(subString: String) {
 
+        }
     }
 }
