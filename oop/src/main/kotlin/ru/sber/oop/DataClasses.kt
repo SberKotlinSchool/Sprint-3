@@ -12,14 +12,6 @@ data class User(val name: String, val age: Long) {
             false
         }
     }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + age.hashCode()
-        result = 31 * result + city.hashCode()
-        return result
-    }
-
 }
 
 fun main() {
