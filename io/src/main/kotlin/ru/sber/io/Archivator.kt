@@ -1,5 +1,6 @@
 package ru.sber.io
 
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
@@ -19,24 +20,18 @@ class Archivator {
          */
         @JvmStatic
         fun zipLogfile() {
-            val inFile = FileInputStream("logfile.log")
-            val outFile = FileOutputStream("logfile.zip")
-            val outZipStream = ZipOutputStream(outFile)
-            val zipEntry = ZipEntry("logfile.log")
-            val buffer = ByteArray(1024)
-            try {
-                outZipStream.putNextEntry(zipEntry)
-                do {
-                    val len = inFile.read(buffer)
-                    if (len > 0) outZipStream.write(buffer,0, len)
-                } while(len > 0)
-            } catch (e: IOException) {
-                println("Damn there is an error. ${e.stackTraceToString()}")
-            } finally {
-                outZipStream.closeEntry()
-                outZipStream.close()
-                inFile.close()
-                outFile.close()
+            val inFile = File("logfile.log")
+            val outFile = File("logfile.zip")
+            inFile.inputStream().use { inStream ->
+                outFile.outputStream().use { outStream ->
+                    ZipOutputStream(outStream).use {
+                        it.putNextEntry(ZipEntry("logfile.log"))
+                        do {
+                            val readByte = inStream.read()
+                            if (readByte != -1) it.write(readByte)
+                        } while (readByte != -1)
+                    }
+                }
             }
         }
 
@@ -46,23 +41,19 @@ class Archivator {
          */
         @JvmStatic
         fun unzipLogfile() {
-            val inFile = FileInputStream("logfile.zip")
-            val outFile = FileOutputStream("unzippedLogfile.log")
-            val inZipStream = ZipInputStream(inFile)
-            val buffer = ByteArray(1024)
-            try {
-                if (inZipStream.nextEntry != null) {
-                    do {
-                        val len = inZipStream.read(buffer)
-                        if (len >= 0) outFile.write(buffer,0, len)
-                    } while(len >= 0)
+
+            val inFile = File("logfile.zip")
+            val outFile = File("unzippedLogfile.log")
+            inFile.inputStream().use { inStream ->
+                ZipInputStream(inStream).use {
+                    inZip -> if(inZip.nextEntry != null) outFile
+                        .outputStream().use {
+                            do {
+                                val readByte = inZip.read()
+                                if (readByte != -1) it.write(readByte)
+                            } while (readByte != -1)
+                    }
                 }
-            } catch (e: IOException) {
-                println("Damn there is an error. ${e.stackTraceToString()}")
-            } finally {
-                inZipStream.close()
-                inFile.close()
-                outFile.close()
             }
         }
     }
