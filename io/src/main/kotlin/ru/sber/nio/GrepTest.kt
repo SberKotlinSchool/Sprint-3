@@ -6,6 +6,6 @@ internal class GrepTest {
 
     @org.junit.jupiter.api.Test
     fun find() {
-        Grep.find("22/Jan/2001:14:27:46")
+        Grep.find("22/Jan/2001")
     }
 }
