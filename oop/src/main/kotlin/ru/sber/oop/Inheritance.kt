@@ -10,7 +10,7 @@ open class Room(val name: String, val size: Int) {
     internal open fun load() = "Nothing much to see here..."
 
 }
-class TownSquare: Room ( "Town Square" ,1000) {
+open class TownSquare: Room ( "Town Square" ,1000) {
     override val dangerLevel = super.dangerLevel - 3
 
     // 1: Переопределил load()  и в качестве придумывания строку переопределил ещё и description

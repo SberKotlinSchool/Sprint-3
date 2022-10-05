@@ -56,6 +56,4 @@ class Goblin : Monster("Goblin", "Weakest monster") {
 val Room.monster: Goblin
     get() = Goblin()
 
-fun Monster.getSalutation(): String {
-    return "Hi, im $name"
-}
+fun Monster.getSalutation(): String ="Hi, im $name"
