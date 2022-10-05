@@ -7,17 +7,15 @@ interface Fightable {
     var healthPoints: Int
     val damageRoll: Int
         get() = Random.nextInt()
-    val name: String
 
     fun attack(opponent: Fightable): Int
 }
 
 class Player(
-        override val powerType: String,
-        override var healthPoints: Int,
-        override val name : String,
-        val isBlessed : Boolean
-    ) : Fightable {
+    override val powerType: String,
+    override var healthPoints: Int,
+    val isBlessed : Boolean
+) : Fightable {
 
     override fun attack(opponent: Fightable): Int {
         val damage = if (isBlessed) damageRoll * 2 else damageRoll
@@ -26,13 +24,7 @@ class Player(
     }
 }
 
-open class Monster(
-        override val powerType: String,
-        override var healthPoints: Int,
-        override val name : String,
-        val description : String
-    ) : Fightable {
-
+abstract class Monster(val name: String, val description : String) : Fightable {
     override fun attack(opponent: Fightable): Int {
         val damage = damageRoll
         opponent.healthPoints -= damage
@@ -40,8 +32,12 @@ open class Monster(
     }
 }
 
-class Goblin(powerType: String, healthPoints: Int, name: String, description: String)
-    : Monster(powerType, healthPoints, name, description) {
+class Goblin(
+    override val powerType: String,
+    override var healthPoints: Int,
+    name: String,
+    description: String
+) : Monster(name, description) {
 
     override val damageRoll: Int
         get() = super.damageRoll / 2
