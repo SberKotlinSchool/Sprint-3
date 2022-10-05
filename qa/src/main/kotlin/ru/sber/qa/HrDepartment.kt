@@ -10,8 +10,12 @@ import java.util.LinkedList
  */
 object HrDepartment {
     var clock = Clock.systemUTC()
-    private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
-    private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
+    // Не понимаю как обратиться к ним не меняя модификатор с private
+    // пробовал создать локально свой Linked List и подсовывать его примерно вот так:
+    // every { hrDepartment getProperty "incomeBox" } answers { localIn }
+    // Но не пошло
+    public val incomeBox: LinkedList<CertificateRequest> = LinkedList()
+    public val outcomeOutcome: LinkedList<Certificate> = LinkedList()
 
     /**
      * Получение запроса на изготовление справки.
@@ -22,8 +26,10 @@ object HrDepartment {
         if (currentDayOfWeek in listOf(DayOfWeek.SUNDAY, DayOfWeek.SATURDAY))
             throw WeekendDayException()
         val isAllowReceiveRequest = when (certificateRequest.certificateType) {
-            CertificateType.NDFL -> currentDayOfWeek in listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
-            CertificateType.LABOUR_BOOK -> currentDayOfWeek in listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY)
+            CertificateType.NDFL -> currentDayOfWeek in
+                    listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
+            CertificateType.LABOUR_BOOK -> currentDayOfWeek in
+                    listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY)
         }
         if (!isAllowReceiveRequest)
             throw NotAllowReceiveRequestException()
