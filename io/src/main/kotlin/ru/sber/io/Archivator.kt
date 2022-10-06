@@ -1,7 +1,9 @@
 package ru.sber.io
 
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.nio.charset.Charset
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -17,20 +19,19 @@ class Archivator {
      * Архив должен располагаться в том же каталоге, что и исходной файл.
      */
     fun zipLogfile() {
-        try {
-            val input = FileInputStream("io/logfile.log")
-            val entry = ZipEntry("logfile.log")
-            val output = ZipOutputStream(FileOutputStream("io/logfile.zip"))
-            output.putNextEntry(entry)
-            val buffer = ByteArray(1024)
-            while (true) {
-                val len = input.read(buffer)
-                if (len < 0)
-                    break
-                output.write(buffer, 0, len)
+        val file = File("io/logfile.log")
+        val reader = file.bufferedReader(Charset.forName("UTF-8"), 1024)
+        val entry = ZipEntry("logfile.log")
+        val zipFile = ZipOutputStream(FileOutputStream("io/logfile.zip"))
+        val lines = reader.readLines()
+
+        zipFile.putNextEntry(entry)
+        val writer = zipFile.writer(Charset.forName("UTF-8"))
+
+        writer.use { w ->
+            lines.forEach { line ->
+                w.write(line)
             }
-        } catch (throwable: Throwable) {
-            println("Stack trace:\n ${throwable.stackTraceToString()}")
         }
     }
 
@@ -39,19 +40,18 @@ class Archivator {
      * Извлечь из архива logfile.zip файл и сохарнить его в том же каталоге с именем unzippedLogfile.log
      */
     fun unzipLogfile() {
-        try {
-            val input = ZipInputStream(FileInputStream("io/logfile.zip"))
-            val output = FileOutputStream("io/unzippedLogfile.log")
-            val buffer = ByteArray(1024)
-            input.nextEntry
-            while (true) {
-                val len = input.read(buffer)
-                if (len < 0)
-                    break
-                output.write(buffer, 0, len);
+        val zipFile = ZipInputStream(FileInputStream("io/logfile.zip"))
+        val reader = zipFile.bufferedReader(Charset.forName("UTF-8"))
+        zipFile.nextEntry
+        val lines = reader.readLines()
+
+        val file = File("io/unzippedLogfile.log")
+        val writer = file.writer(Charset.forName("UTF-8"))
+
+        writer.use { w ->
+            lines.forEach { line ->
+                w.write(line)
             }
-        } catch (throwable: Throwable) {
-            println("Stack trace:\n ${throwable.stackTraceToString()}")
         }
     }
 }
