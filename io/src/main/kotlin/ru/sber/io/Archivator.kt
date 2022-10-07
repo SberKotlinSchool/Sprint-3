@@ -30,7 +30,7 @@ class Archivator {
 
         writer.use { w ->
             lines.forEach { line ->
-                w.write(line)
+                w.write(line  + "\n")
             }
         }
     }
@@ -50,8 +50,15 @@ class Archivator {
 
         writer.use { w ->
             lines.forEach { line ->
-                w.write(line)
+                w.write(line + "\n")
             }
         }
     }
+}
+
+fun main() {
+    val archivator = Archivator()
+    archivator.zipLogfile()
+    archivator.unzipLogfile()
+
 }
