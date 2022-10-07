@@ -24,7 +24,7 @@ internal class CertificateRequestTest {
     }
 
     @Test
-    fun process() {
+    fun processTest() {
         val scanData = Random.nextBytes(abs(Random.nextInt(1, 128)))
         val employeeNumber = abs(Random.nextLong())
         val certificateRequest = CertificateRequest(employeeNumber, CertificateType.NDFL)
