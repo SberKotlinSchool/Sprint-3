@@ -4,40 +4,38 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.math.abs
 import kotlin.random.Random
-import kotlin.test.assertFailsWith
+import kotlin.test.assertEquals
 
 internal class CertificateRequestTest {
 
     @BeforeEach
     fun init() {
-        mockkObject(Random)
+        mockkObject(Scanner)
     }
 
     @AfterEach
     fun tearDown() {
-        unmockkObject(Random)
+        unmockkObject(Scanner)
     }
 
     @Test
     fun processTest() {
-        val scanData = Random.nextBytes(abs(Random.nextInt(1, 128)))
+
+        val scanData = Random.nextBytes(100)
         val employeeNumber = abs(Random.nextLong())
+
+        every { Scanner.getScanData() } returns scanData
+
         val certificateRequest = CertificateRequest(employeeNumber, CertificateType.NDFL)
-
-        every { Random.nextLong(5000L, 15000L) } returnsMany listOf(5000L, 14999L)
-        every { Random.nextBytes(100) } returns  scanData
-
         val certificate = certificateRequest.process(employeeNumber)
 
-        assertEquals(certificate.processedBy, employeeNumber)
-        assertEquals(certificate.certificateRequest, certificateRequest)
-        assertEquals(certificate.data, scanData)
+        assertEquals(scanData, certificate.data)
+        assertEquals(employeeNumber, certificate.processedBy)
+        assertEquals(certificateRequest, certificate.certificateRequest)
 
-        assertFailsWith<ScanTimeoutException> { certificateRequest.process(employeeNumber) }
     }
 }
