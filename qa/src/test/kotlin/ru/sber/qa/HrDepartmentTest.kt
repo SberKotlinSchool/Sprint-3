@@ -3,6 +3,7 @@ package ru.sber.qa
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.unmockkAll
+import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,8 +18,11 @@ import kotlin.test.assertFailsWith
 
 internal class HrDepartmentTest {
 
-    private val employeeId = abs(Random.nextLong())
+    private val employeeId = abs(Random.nextLong(1L, 100L))
     private lateinit var certificateRequest: CertificateRequest
+
+    private val MONDAY: Clock = Clock.fixed(Instant.parse("2022-10-10T00:00:00Z"), ZoneOffset.UTC)
+    private val SUNDAY: Clock = Clock.fixed(Instant.parse("2022-10-16T00:00:00Z"), ZoneOffset.UTC)
 
     @BeforeEach
     fun init() {
@@ -42,11 +46,12 @@ internal class HrDepartmentTest {
         val data = Random.nextBytes(100)
         val certificate = Certificate(certificateRequest, employeeId, data)
 
-        hrDepartment.clock = Clock.fixed(Instant.parse("2022-10-10T00:00:00Z"), ZoneOffset.UTC)
-
-        assertFailsWith<NullPointerException> { hrDepartment.processNextRequest(employeeId) }
+        hrDepartment.clock = MONDAY
 
         every { certificateRequest.process(employeeId) } returns certificate
+
+        // NPE when incomeBox is empty
+        assertFailsWith<NullPointerException> { hrDepartment.processNextRequest(employeeId) }
 
         hrDepartment.receiveRequest(certificateRequest)
         hrDepartment.processNextRequest(employeeId)
@@ -58,6 +63,10 @@ internal class HrDepartmentTest {
         assert(incomeBox.isEmpty())
         assert(outComeBox.size == 1)
         assertEquals(certificate, processedCertificate)
+
+        verify {
+            certificateRequest.certificateType
+        }
 
     }
 
