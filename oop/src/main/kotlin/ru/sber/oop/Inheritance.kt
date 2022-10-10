@@ -1,12 +1,19 @@
 package ru.sber.oop
 
+import kotlin.random.Random
+
 open class Room(val name: String, val size: Int) {
 
     protected open val dangerLevel = 5
+    val monster: Monster = Goblin(
+        "BigNail",
+        "The fourth son of the fifth king",
+        "Feet",
+        Random.nextInt(10, 50))
 
     fun description() = "Room: $name"
 
-    open fun load() = "Nothing much to see here..."
+    open fun load() = monster.getSalutation()
 
     constructor(name: String) : this(name, 100)
 }
