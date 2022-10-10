@@ -24,18 +24,29 @@ internal class ScannerTest {
     }
 
     @Test
-    fun getScanDataTest() {
+    fun getScanDataExceptionTest() {
 
-        every { Random.nextLong(5000L, 15000L) } returnsMany listOf(14999L, 5000L)
+        every { Random.nextLong(5000L, 15000L) } returns 14999L
 
         assertFailsWith<ScanTimeoutException> { Scanner.getScanData() }
+
+        verify {
+            Random.nextLong(5000L, 15000L)
+        }
+    }
+
+    @Test
+    fun getScanDataSuccessTest() {
+
+        every { Random.nextLong(5000L, 15000L) } returns 5000L
 
         val scanData = Scanner.getScanData()
 
         assertEquals(100, scanData.size)
 
-        verify (exactly = 2) {
+        verify {
             Random.nextLong(5000L, 15000L)
         }
     }
+
 }
