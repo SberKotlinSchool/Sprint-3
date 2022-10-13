@@ -20,7 +20,7 @@ data class User(val name: String, val age: Long) {
 
 fun main() {
     val user1 = User("Alex", 13)
-    val user2 = user1.copy()
+    val user2 = user1.copy("Lalex")
 
     user1.city = "Omsk"
     val user3 = user1.copy()
