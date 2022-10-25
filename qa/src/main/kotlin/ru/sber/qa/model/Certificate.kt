@@ -1,4 +1,4 @@
-package ru.sber.qa
+package ru.sber.qa.model
 
 /**
  * Готовая справка.

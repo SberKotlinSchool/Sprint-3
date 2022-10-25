@@ -1,3 +1,3 @@
-package ru.sber.qa
+package ru.sber.qa.exception
 
 class WeekendDayException : Exception("Заказ справков в выходной день не работает")
