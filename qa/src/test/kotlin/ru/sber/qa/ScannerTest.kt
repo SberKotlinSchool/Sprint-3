@@ -1,6 +1,7 @@
 package ru.sber.qa
 
 import io.mockk.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -12,6 +13,10 @@ internal class ScannerTest {
     @BeforeEach
     fun setUp() {
         mockkObject(Random)
+    }
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
     }
     @Test
     fun getScanData() {
