@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import java.time.Clock
@@ -27,20 +28,18 @@ internal class HrDepartmentTest {
 
     companion object {
         @JvmStatic
-        fun positiveTypeAndDaySequence(): Stream<Pair<DayOfWeek, CertificateType>> = Arrays.stream(DayOfWeek.values())
+        fun positiveTypeAndDaySequence(): Stream<Arguments> = Arrays.stream(DayOfWeek.values())
             .filter { it.ordinal < 5 }
-            .map { Pair(
-                it,
-                if (it.ordinal % 2 == 0) CertificateType.NDFL else CertificateType.LABOUR_BOOK
-            ) }
+            .map {
+                Arguments.of(it, if (it.ordinal % 2 == 0) CertificateType.NDFL else CertificateType.LABOUR_BOOK)
+            }
 
         @JvmStatic
-        fun negativeTypeAndDaySequence(): Stream<Pair<DayOfWeek, CertificateType>> = Arrays.stream(DayOfWeek.values())
+        fun negativeTypeAndDaySequence(): Stream<Arguments> = Arrays.stream(DayOfWeek.values())
             .filter { it.ordinal < 5 }
-            .map { Pair(
-                it,
-                if (it.ordinal % 2 == 1) CertificateType.NDFL else CertificateType.LABOUR_BOOK
-            ) }
+            .map {
+                Arguments.of(it, if (it.ordinal % 2 == 1) CertificateType.NDFL else CertificateType.LABOUR_BOOK)
+            }
     }
 
     @BeforeEach
@@ -65,18 +64,22 @@ internal class HrDepartmentTest {
 
     @ParameterizedTest
     @MethodSource("negativeTypeAndDaySequence")
-    fun `given incorrect CertificateType for dayOfWeek when receiveRequest and processNextRequest then NotAllowReceiveRequestException thrown`(dayOfWeek: DayOfWeek) {
+    fun `given incorrect CertificateType for dayOfWeek when receiveRequest and processNextRequest then NotAllowReceiveRequestException thrown`(
+        dayOfWeek: DayOfWeek, certificateType: CertificateType
+    ) {
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
+        every { certificateRequest.certificateType } returns certificateType
 
         assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) }
     }
 
     @ParameterizedTest
     @MethodSource("positiveTypeAndDaySequence")
-    fun `given correct CertificateType for dayOfWeek when receiveRequest and processNextRequest then no Exceptions thrown`(dayOfWeek: DayOfWeek) {
+    fun `given correct CertificateType for dayOfWeek when receiveRequest and processNextRequest then no Exceptions thrown`(
+        dayOfWeek: DayOfWeek, certificateType: CertificateType
+    ) {
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
+        every { certificateRequest.certificateType } returns certificateType
 
         assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }
         assertDoesNotThrow { HrDepartment.processNextRequest(hrNumber) }
