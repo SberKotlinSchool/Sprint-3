@@ -12,9 +12,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
+import java.util.*
+import java.util.stream.Stream
 
 internal class HrDepartmentTest {
     @MockK
@@ -22,14 +25,23 @@ internal class HrDepartmentTest {
 
     private val hrNumber = 1L
 
-//    companion object {
-//        @JvmStatic
-//        fun positiveTypeAndDaySequence(): List<Arguments> = DayOfWeek.values().mapIndexed { idx, day ->
-//            Arguments.of(
-//                day, if (idx % 2 == 0) CertificateType.NDFL else CertificateType.LABOUR_BOOK
-//            )
-//        }
-//    }
+    companion object {
+        @JvmStatic
+        fun positiveTypeAndDaySequence(): Stream<Pair<DayOfWeek, CertificateType>> = Arrays.stream(DayOfWeek.values())
+            .filter { it.ordinal < 5 }
+            .map { Pair(
+                it,
+                if (it.ordinal % 2 == 0) CertificateType.NDFL else CertificateType.LABOUR_BOOK
+            ) }
+
+        @JvmStatic
+        fun negativeTypeAndDaySequence(): Stream<Pair<DayOfWeek, CertificateType>> = Arrays.stream(DayOfWeek.values())
+            .filter { it.ordinal < 5 }
+            .map { Pair(
+                it,
+                if (it.ordinal % 2 == 1) CertificateType.NDFL else CertificateType.LABOUR_BOOK
+            ) }
+    }
 
     @BeforeEach
     fun setUp() {
@@ -45,24 +57,15 @@ internal class HrDepartmentTest {
 
     @ParameterizedTest
     @EnumSource(value = DayOfWeek::class, names = ["SATURDAY", "SUNDAY"])
-    fun `receiveRequest when Weekend throws WeekendDayException`(dayOfWeek: DayOfWeek) {
+    fun `given weekend days when receiveRequest then WeekendDayException thrown`(dayOfWeek: DayOfWeek) {
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
 
         assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certificateRequest) }
     }
 
     @ParameterizedTest
-    @EnumSource(value = DayOfWeek::class, names = ["TUESDAY", "THURSDAY"])
-    fun `receiveRequest when CertificateType NDFL throws NotAllowReceiveRequestException`(dayOfWeek: DayOfWeek) {
-        every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
-        every { certificateRequest.certificateType } returns CertificateType.NDFL
-
-        assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) }
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = DayOfWeek::class, names = ["MONDAY", "WEDNESDAY", "FRIDAY"])
-    fun `receiveRequest when CertificateType LABOUR_BOOK throws NotAllowReceiveRequestException`(dayOfWeek: DayOfWeek) {
+    @MethodSource("negativeTypeAndDaySequence")
+    fun `given incorrect CertificateType for dayOfWeek when receiveRequest and processNextRequest then NotAllowReceiveRequestException thrown`(dayOfWeek: DayOfWeek) {
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
         every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
 
@@ -70,19 +73,8 @@ internal class HrDepartmentTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = DayOfWeek::class, names = ["MONDAY", "WEDNESDAY", "FRIDAY"])
-    fun `receiveRequest and processNextRequest when CertificateType NDFL not throw any Exception`(dayOfWeek: DayOfWeek) {
-        every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
-        every { certificateRequest.certificateType } returns CertificateType.NDFL
-
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }
-        assertDoesNotThrow { HrDepartment.processNextRequest(hrNumber) }
-    }
-
-    @ParameterizedTest
-//    @MethodSource("ru.sber.qa.HrDepartmentTest#positiveTypeAndDaySequence")
-    @EnumSource(value = DayOfWeek::class, names = ["TUESDAY", "THURSDAY"])
-    fun `receiveRequest and processNextRequest when CertificateType LABOUR_BOOK not throw any Exception`(dayOfWeek: DayOfWeek) {
+    @MethodSource("positiveTypeAndDaySequence")
+    fun `given correct CertificateType for dayOfWeek when receiveRequest and processNextRequest then no Exceptions thrown`(dayOfWeek: DayOfWeek) {
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
         every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
 
@@ -91,9 +83,7 @@ internal class HrDepartmentTest {
     }
 
     @Test
-    fun `processNextRequest when not received request throw NullPointerException`() {
+    fun `given request not received when processNextRequest then NullPointerException thrown`() {
         assertThrows<NullPointerException> { HrDepartment.processNextRequest(1L) }
     }
-
-
 }
