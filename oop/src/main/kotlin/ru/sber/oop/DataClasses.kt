@@ -9,12 +9,14 @@ data class User(val name: String, val age: Long) {
         other as User
         if (name != other.name) return false
         if (age != other.age) return false
+        if (city != other.city) return false
         return true
     }
 
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + age.hashCode()
+        result = 31 * result + city.hashCode()
         return result
     }
 }
