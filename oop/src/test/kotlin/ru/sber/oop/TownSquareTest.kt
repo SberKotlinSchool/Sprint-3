@@ -22,12 +22,14 @@ internal class TownSquareTest {
         assertEquals("Town Square", townSquare.name)
         assertEquals(1000, townSquare.size)
     }
+
     @Test
     fun `load and parent load not equals`() {
         val room = Room("Test", 1)
         val townSquare = TownSquare()
         assertNotEquals(room.load(), townSquare.load())
     }
+
     @Test
     fun `second constructor with default size 100`() {
         val room = Room("Test")

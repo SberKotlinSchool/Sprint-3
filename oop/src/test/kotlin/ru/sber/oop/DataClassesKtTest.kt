@@ -11,6 +11,7 @@ internal class DataClassesKtTest {
         val user2 = user1.copy(name = "Bob")
         assertEquals("Bob", user2.name)
     }
+
     @Test
     fun `set city user1 and copy user3 not equals`() {
         val user1 = User("Alex", 13)

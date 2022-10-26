@@ -7,7 +7,8 @@ open class Room(val name: String, val size: Int) {
     fun description() = "Room: $name"
 
     open fun load() = "Nothing much to see here..."
-    constructor(name: String): this(name, 100)
+
+    constructor(name: String) : this(name, 100)
 }
 
 class TownSquare : Room("Town Square", 1000) {
