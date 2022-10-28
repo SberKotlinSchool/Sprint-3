@@ -32,6 +32,7 @@ class Grep {
             outputStream.channel.use { result ->
                 Files.walk(logsPath)
                     .filter { p -> p.isRegularFile() }
+                    .parallel()
                     .forEach { file ->
                         checkFile(file, subString, result)
                     }
