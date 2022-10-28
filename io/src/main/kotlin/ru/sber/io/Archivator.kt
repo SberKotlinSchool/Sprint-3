@@ -12,6 +12,7 @@ import java.util.zip.ZipOutputStream
  * Для реализиации использовать ZipInputStream и ZipOutputStream.
  */
 class Archivator {
+    private val bufferSize = 2048
 
     /**
      * Метод, который архивирует файл logfile.log в архив logfile.zip.
@@ -20,10 +21,10 @@ class Archivator {
     fun zipLogfile() {
         val logFile = File("io/logfile.log")
         val zipFile = File("io/logfile.zip")
-        ZipOutputStream(BufferedOutputStream(zipFile.outputStream(), 2048))
+        ZipOutputStream(BufferedOutputStream(zipFile.outputStream(), bufferSize))
             .use { zipOut ->
                 zipOut.putNextEntry(ZipEntry(logFile.name))
-                logFile.inputStream().buffered(2048)
+                logFile.inputStream().buffered(bufferSize)
                     .use { data -> data.copyTo(zipOut) }
             }
     }
@@ -33,6 +34,15 @@ class Archivator {
      * Извлечь из архива logfile.zip файл и сохарнить его в том же каталоге с именем unzippedLogfile.log
      */
     fun unzipLogfile() {
+        val zippedFile = File("io/logfile.zip")
+        val unzippedFile = File("io/unzippedLogfile.log")
 
+        unzippedFile.outputStream().buffered(bufferSize).use { unzipOut ->
+            ZipInputStream(zippedFile.inputStream().buffered(bufferSize))
+                .use { zipIn ->
+                    zipIn.nextEntry
+                    zipIn.copyTo(unzipOut)
+                }
+        }
     }
 }
