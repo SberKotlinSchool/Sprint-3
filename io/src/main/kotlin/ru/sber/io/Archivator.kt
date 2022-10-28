@@ -21,7 +21,7 @@ class Archivator {
     fun zipLogfile() {
         val logFile = File("io/logfile.log")
         val zipFile = File("io/logfile.zip")
-        ZipOutputStream(BufferedOutputStream(zipFile.outputStream(), bufferSize))
+        ZipOutputStream(zipFile.outputStream().buffered(bufferSize))
             .use { zipOut ->
                 zipOut.putNextEntry(ZipEntry(logFile.name))
                 logFile.inputStream().buffered(bufferSize)
