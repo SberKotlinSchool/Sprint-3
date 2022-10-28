@@ -26,6 +26,7 @@ class Player(val name: String, val isBlessed: Boolean) : Fightable {
         if (isBlessed) {
             attack *= 2
         }
+        opponent.healthPoints -= attack
         return attack
     }
 }
