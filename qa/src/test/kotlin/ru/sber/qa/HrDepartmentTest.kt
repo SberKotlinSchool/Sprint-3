@@ -3,6 +3,7 @@ package ru.sber.qa
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.verify
 import org.junit.Test
 import org.junit.jupiter.api.BeforeEach
 
@@ -59,7 +60,6 @@ internal class HrDepartmentTest {
 
     @ParameterizedTest
     @MethodSource("getTueThu")
-    //переделать  на параметризированный тест  с другими днями  недели  по которым не выдают ndfl
     fun ndflRequestShouldGetNotAllowedException(dayOfWeek: String) {
         assertFailsWith<NotAllowReceiveRequestException>("Не получено корректное исключение NotAllowReceiveRequestException ") {
             HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
@@ -69,7 +69,6 @@ internal class HrDepartmentTest {
 
     @ParameterizedTest
     @MethodSource("getMonWedFri")
-    //переделать  на параметризированный тест  с другими днями  недели  по которым выдают ndfl
     fun ndflRequestShouldNotGetException(dayOfWeek: String) {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
@@ -77,10 +76,19 @@ internal class HrDepartmentTest {
 
     @ParameterizedTest
     @MethodSource("getTueThu")
-    //переделать  на параметризированный тест  с другими днями  недели  по которым выдают labourBook
     fun labourBookRequestShouldNotGetException(dayOfWeek: String) {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
+        verify (exactly = 1){ HrDepartment.receiveRequest(certRequestLabourBook) }
+    }
+
+    @Test
+    fun labourBookRequestShouldNotGetException1() {
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-01T00:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
+        HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
+        HrDepartment.processNextRequest(certRequestLabourBook.employeeNumber)
+       // verify (exactly = 1){ HrDepartment.processNextRequest(certRequestLabourBook.employeeNumber) }
+
     }
 
     companion object {
