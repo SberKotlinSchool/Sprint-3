@@ -1,6 +1,5 @@
 package ru.sber.io
 
-import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -25,7 +24,12 @@ class Archiver {
         target.toFile().outputStream().use { fout ->
             ZipOutputStream(fout).use { zout ->
                 zout.putNextEntry(ZipEntry(source.fileName.toString()))
-                Files.copy(source, zout)
+                source.toFile().inputStream().use {fin ->
+                    val buffer = ByteArray(fin.available())
+                    fin.read(buffer)
+                    zout.write(buffer)
+                    zout.closeEntry()
+                }
             }
         }
     }
