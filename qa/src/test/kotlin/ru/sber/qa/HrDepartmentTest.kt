@@ -3,37 +3,23 @@ package ru.sber.qa
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
-import org.junit.Assert.assertThrows
-import org.junit.Before
 import org.junit.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.BeforeEach
 
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import java.time.Clock
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.ZoneId
-import java.util.stream.Stream
-import kotlin.jvm.Throws
-import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 
 internal class HrDepartmentTest {
-
-    val MONDAY: String = "2022-10-31T00:15:30.00Z"
-    val TUESDAY: String = "2022-11-01T00:15:30.00Z"
-    val WEDNESDAY: String = "2022-11-02T00:15:30.00Z"
-    val THURSDAY: String = "2022-11-03T00:15:30.00Z"
-    val FRIDAY: String = "2022-11-04T00:15:30.00Z"
 
     val certRequestNdfl = mockk<CertificateRequest>()
     val certRequestLabourBook = mockk<CertificateRequest>()
 
-    @Before
+    @BeforeEach
     fun setUp() {
         mockkObject(HrDepartment)
 
@@ -44,55 +30,77 @@ internal class HrDepartmentTest {
         every { certRequestLabourBook.certificateType } returns CertificateType.LABOUR_BOOK
     }
 
-    @Test
-    fun ndflRequestShouldGetWeekendDayException() {
-        assertFailsWith<WeekendDayException>("Не получено корректное исключение WeekendDayException ") {
-            HrDepartment.clock = Clock.fixed(Instant.parse("2022-10-30T10:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
+    @ParameterizedTest
+    @MethodSource("getWeekend")
+    fun ndflRequestShouldGetWeekendDayException(dayOfWeek: String) {
+        assertFailsWith<WeekendDayException>("Не получено корректное исключение WeekendDayException") {
+            HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
             HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
         }
     }
 
-    @Test
-    fun labourBookRequestShouldGetWeekendDayException() {
+    @ParameterizedTest
+    @MethodSource("getWeekend")
+    fun labourBookRequestShouldGetWeekendDayException(dayOfWeek: String) {
         assertFailsWith<WeekendDayException>("Не получено корректное исключение WeekendDayException ") {
-            HrDepartment.clock = Clock.fixed(Instant.parse("2022-10-30T10:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
+            HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
             HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
         }
     }
 
-    @Test
-    //переделать  на параметризированный тест  с другими днями  недели  по которым не выдают labour_book
-    fun labourBookRequestShouldGetNotAllowedException() {
+    @ParameterizedTest
+    @MethodSource("getMonWedFri")
+    fun labourBookRequestShouldGetNotAllowedException(dayOfWeek: String) {
         assertFailsWith<NotAllowReceiveRequestException>("Не получено корректное исключение NotAllowReceiveRequestException ") {
-            HrDepartment.clock = Clock.fixed(Instant.parse("2022-10-31T00:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
+            HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
             HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("getTueThu")
     //переделать  на параметризированный тест  с другими днями  недели  по которым не выдают ndfl
-    fun ndflRequestShouldGetNotAllowedException() {
+    fun ndflRequestShouldGetNotAllowedException(dayOfWeek: String) {
         assertFailsWith<NotAllowReceiveRequestException>("Не получено корректное исключение NotAllowReceiveRequestException ") {
-            HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-01T00:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
+            HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
             HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("getMonWedFri")
     //переделать  на параметризированный тест  с другими днями  недели  по которым выдают ndfl
-    fun ndflRequestShouldNotGetException() {
-            HrDepartment.clock = Clock.fixed(Instant.parse("2022-10-31T00:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
-            HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
-
+    fun ndflRequestShouldNotGetException(dayOfWeek: String) {
+        HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
+        HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
     }
 
-//    companion object {
-//        @JvmStatic
-//        fun getValue(): Stream<Arguments> {
-//            return Stream.of(
-//                Arguments.of("2022-10-31T00:15:30.00Z",
-//                Arguments.of("2022-10-31T00:15:30.00Z")
-//            ))
-//        }
-//    }
+    @ParameterizedTest
+    @MethodSource("getTueThu")
+    //переделать  на параметризированный тест  с другими днями  недели  по которым выдают labourBook
+    fun labourBookRequestShouldNotGetException(dayOfWeek: String) {
+        HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
+        HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
+    }
+
+    companion object {
+        @JvmStatic
+        fun getMonWedFri() = listOf(
+            Arguments.of("2022-10-31T00:15:30.00Z"),
+            Arguments.of("2022-11-02T00:15:30.00Z"),
+            Arguments.of("2022-11-04T00:15:30.00Z")
+        )
+
+        @JvmStatic
+        fun getTueThu() = listOf(
+            Arguments.of("2022-11-01T00:15:30.00Z"),
+            Arguments.of("2022-11-03T00:15:30.00Z")
+        )
+
+        @JvmStatic
+        fun getWeekend() = listOf(
+            Arguments.of("2022-11-05T00:15:30.00Z"),
+            Arguments.of("2022-11-06T00:15:30.00Z")
+        )
+    }
 }
