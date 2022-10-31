@@ -1,5 +1,6 @@
 package ru.sber.qa
 
+import io.mockk.every
 import io.mockk.mockkObject
 import org.junit.jupiter.api.Test
 
@@ -9,13 +10,16 @@ import kotlin.random.Random
 
 internal class ScannerTest {
 
+    val random = Random.nextBytes(1)
+
     @BeforeEach
     fun setUp() {
         mockkObject(Scanner)
+        every { Scanner.getScanData() } returns random
     }
 
     @Test
     fun getScanData() {
-        assertEquals(Random.nextBytes(100).toString(), Scanner.getScanData().toString())
+        assertEquals(random, Scanner.getScanData())
     }
 }

@@ -4,8 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
-import org.junit.Test
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -79,16 +79,9 @@ internal class HrDepartmentTest {
     fun labourBookRequestShouldNotGetException(dayOfWeek: String) {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
-        verify (exactly = 1){ HrDepartment.receiveRequest(certRequestLabourBook) }
-    }
-
-    @Test
-    fun labourBookRequestShouldNotGetException1() {
-        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-01T00:15:30.00Z"), ZoneId.of("Asia/Calcutta"));
-        HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
-        HrDepartment.processNextRequest(certRequestLabourBook.employeeNumber)
-       // verify (exactly = 1){ HrDepartment.processNextRequest(certRequestLabourBook.employeeNumber) }
-
+        verify(exactly = 1) {
+            HrDepartment.receiveRequest(certRequestLabourBook)
+        }
     }
 
     companion object {
