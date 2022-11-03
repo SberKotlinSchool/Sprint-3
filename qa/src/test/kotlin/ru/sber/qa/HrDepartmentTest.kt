@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.testng.annotations.Test
+import org.junit.jupiter.api.Test
 import java.text.SimpleDateFormat
 import org.junit.jupiter.api.assertThrows
 import java.time.*

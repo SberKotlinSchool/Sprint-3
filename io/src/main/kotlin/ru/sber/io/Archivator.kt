@@ -1,6 +1,6 @@
 package ru.sber.io
 
-import org.testng.annotations.Test
+
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -22,7 +22,7 @@ class Archivator {
      * Метод, который архивирует файл logfile.log в архив logfile.zip.
      * Архив должен располагаться в том же каталоге, что и исходной файл.
      */
-    @Test
+
     fun zipLogfile() {
         val pathIn = File("$dirPath/logfile.log")
         val pathOut = File("$dirPath/logfile.zip")
@@ -41,7 +41,7 @@ class Archivator {
      * Метод, который извлекает файл из архива.
      * Извлечь из архива logfile.zip файл и сохарнить его в том же каталоге с именем unzippedLogfile.log
      */
-    @Test
+
     fun unzipLogfile() {
         val pathIn = File("$dirPath/logfile.zip")
         val pathOut = File("$dirPath/unzippedLogfile.log")
