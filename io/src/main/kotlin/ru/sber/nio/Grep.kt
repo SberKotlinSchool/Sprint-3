@@ -36,9 +36,11 @@ class Grep {
             Files.delete(resultPath)
             Files.createFile(resultPath)
         }
-        val listFiles = Files.walk(pathDir).filter { it.toString().endsWith(".log") }.toList()
+        val listFiles : MutableList<Path> = mutableListOf()
+        Files.walk(pathDir).filter { it.toString().endsWith(".log") }.forEach { listFiles.add(it) }
         for (f in listFiles) {
-            val thisList = Files.lines(f).toList()
+            val thisList : MutableList<String> = mutableListOf()
+            Files.lines(f).forEach { thisList.add(it) }
             val nameFiles = f.name
             for (text in thisList.filter { it.uppercase().contains(subString.uppercase()) }) {
                 //Начинаем не с позиции 0, а с 1й
@@ -48,4 +50,5 @@ class Grep {
             }
         }
     }
+
 }
