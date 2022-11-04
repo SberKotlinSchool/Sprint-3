@@ -2,16 +2,13 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkClass
-import io.mockk.mockkStatic
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
 import java.time.Clock
-import java.time.DayOfWeek
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.ZoneId
 import java.util.*
 
 internal class HrDepartmentTest {
@@ -20,17 +17,15 @@ internal class HrDepartmentTest {
 
     @BeforeEach
     fun setUp() {
-        mockkStatic(LocalDateTime::class)
         certificateRequest = mockk()
     }
 
     @Test
     fun `test receiveRequest throws WeekendDayException`() {
         //given
-        val systemClock = mockkClass(Clock::class)
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-06T10:00:00.00Z"), ZoneId.of("Europe/Moscow")) //SUNDAY
 
         //when
-        every { LocalDateTime.now(systemClock).dayOfWeek } returns DayOfWeek.SUNDAY
         every { certificateRequest.certificateType } returns CertificateType.NDFL
 
         //then
@@ -41,9 +36,9 @@ internal class HrDepartmentTest {
     fun `test receiveRequest correct output when DayOfWeek equals MONDAY and CertificateType equals NDFL`() {
         //given
         val incomeBox: LinkedList<CertificateRequest> = LinkedList()
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-07T10:00:00.00Z"), ZoneId.of("Europe/Moscow")) //MONDAY
 
         //when
-        every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns DayOfWeek.MONDAY
         every { certificateRequest.certificateType } returns CertificateType.NDFL
         HrDepartment.receiveRequest(certificateRequest)
 
@@ -61,9 +56,9 @@ internal class HrDepartmentTest {
     fun `test receiveRequest correct output when DayOfWeek equals TUESDAY and CertificateType equals LABOUR_BOOK`() {
         //given
         val incomeBox: LinkedList<CertificateRequest> = LinkedList()
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-08T10:00:00.00Z"), ZoneId.of("Europe/Moscow")) //TUESDAY
 
         //when
-        every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns DayOfWeek.TUESDAY
         every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
         HrDepartment.receiveRequest(certificateRequest)
 
@@ -79,15 +74,19 @@ internal class HrDepartmentTest {
 
     @Test
     fun `test receiveRequest throws NotAllowReceiveRequestException`() {
+        //given
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-08T10:00:00.00Z"), ZoneId.of("Europe/Moscow")) //TUESDAY
+
         //when
-        every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns DayOfWeek.TUESDAY
         every { certificateRequest.certificateType } returns CertificateType.NDFL
 
         //then
         assertThrows(NotAllowReceiveRequestException::class.java) { HrDepartment.receiveRequest(certificateRequest) }
 
+        //given
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-07T10:00:00.00Z"), ZoneId.of("Europe/Moscow")) //MONDAY
+
         //when
-        every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns DayOfWeek.MONDAY
         every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
 
         //then
