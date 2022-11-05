@@ -35,7 +35,10 @@ object HrDepartment {
      */
     fun processNextRequest(hrEmployeeNumber: Long) {
         val certificateRequest = incomeBox.poll()
-        val certificate = certificateRequest.process(hrEmployeeNumber)
+        val certificate: Certificate
+        if (certificateRequest != null){
+            certificate = certificateRequest.process(hrEmployeeNumber)
+        }else throw NullPointerException("Сперва прошу убедиться, что имеются запросы на изготовление справки")
         outcomeOutcome.push(certificate)
     }
 }

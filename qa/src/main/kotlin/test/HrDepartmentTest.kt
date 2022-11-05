@@ -4,6 +4,7 @@ import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -62,6 +63,18 @@ internal class HrDepartmentTest{
         assertDoesNotThrow { HrDepartment.processNextRequest(hrEmployeeNumber) }
     }
 
+    @Test
+    fun testProcessNextRequestToThrowNullPointerException(){
+        //result
+        assertThrows(NullPointerException::class.java) { HrDepartment.processNextRequest(2L) }
+    }
+
+    @Test
+    fun testProcessNextRequestToThrowNullPointerExceptionWithText() {
+        val exception: Exception = assertThrows(NullPointerException::class.java) { HrDepartment.processNextRequest(2L) }
+        assertEquals("Сперва прошу убедиться, что имеются запросы на изготовление справки", exception.message)
+    }
+
     companion object {
         @JvmStatic
         fun receiveRequestWeekendDayExceptionParams() = listOf(
@@ -101,4 +114,5 @@ internal class HrDepartmentTest{
     fun tearDown() {
         unmockkAll()
     }
+
 }

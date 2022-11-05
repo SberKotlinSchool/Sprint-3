@@ -13,4 +13,5 @@ internal class ScanTimeoutExceptionTest{
         }
         assertEquals("Таймаут сканирования документа", exception.message)
     }
+
 }

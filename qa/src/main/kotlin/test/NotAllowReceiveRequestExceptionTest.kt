@@ -13,4 +13,5 @@ internal class NotAllowReceiveRequestExceptionTest{
         }
         assertEquals("Не разрешено принять запрос на справку", exception.message)
     }
+
 }

@@ -13,4 +13,5 @@ internal class WeekendDayExceptionTest{
         }
         assertEquals("Заказ справков в выходной день не работает", exception.message)
     }
+
 }

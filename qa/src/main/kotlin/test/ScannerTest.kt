@@ -86,4 +86,5 @@ internal class ScannerTest {
     fun tearDown() {
         unmockkAll()
     }
+
 }
