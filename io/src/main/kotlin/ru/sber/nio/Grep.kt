@@ -26,13 +26,11 @@ class Grep {
         resultChan.writer().use { out ->
             Files.walk(path).filter { it.isRegularFile() }.forEach {
                 Paths.get(it.toString()).useLines { lines ->
-                    var ind = 0
-                    lines.forEach { line ->
+                    lines.withIndex().forEach { (ind, line) ->
                         if (line.contains(subString)) {
                             val str = "${it.toAbsolutePath().fileName}: $ind $line\n"
                             out.write(str)
                         }
-                        ind += 1
                     }
                 }
             }

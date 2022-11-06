@@ -14,18 +14,21 @@ internal class ScannerTest {
     fun setUp() {
         mockkObject(Random)
     }
+
     @AfterEach
     fun tearDown() {
         unmockkAll()
     }
+
     @Test
     fun getScanData() {
         every { Random.nextLong(any(), any()) } returns 1L
         every { Random.nextBytes(any<Int>()) } returns ByteArray(1)
         val data = Scanner.getScanData()
         verify { Random.nextBytes(any<Int>()) }
-        assertTrue(data.isNotEmpty())
+        assertEquals(data.size, 1)
     }
+
     @Test
     fun `throw ScanTimeoutException`() {
         assertThrows<ScanTimeoutException> {

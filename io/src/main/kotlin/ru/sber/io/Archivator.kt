@@ -20,7 +20,7 @@ class Archivator {
         val file = FileInputStream("logfile.log")
         val zipFile = FileOutputStream("logfile.zip")
         val zip = ZipOutputStream(zipFile)
-        file.use {fi ->
+        file.use { fi ->
             zip.use { out ->
                 val ze = ZipEntry("logfile.log")
                 out.putNextEntry(ze)

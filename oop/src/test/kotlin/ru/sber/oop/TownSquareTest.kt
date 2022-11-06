@@ -1,21 +1,10 @@
 package ru.sber.oop
 
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 
 internal class TownSquareTest {
-
-    @BeforeEach
-    fun setUp() {
-    }
-
-    @AfterEach
-    fun tearDown() {
-    }
-
     @Test
     fun `create Town Square with name Town Square and size 1000`() {
         val townSquare = TownSquare()

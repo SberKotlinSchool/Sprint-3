@@ -2,18 +2,17 @@ package ru.sber.qa
 
 import io.mockk.*
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
+
+fun getClock(time: String): Clock =
+    Clock.fixed(Instant.parse(time), ZoneId.of("UTC"))
 
 internal class HrDepartmentTest {
     private val certificateRequest = mockk<CertificateRequest>()
-    private val certificate = mockk<Certificate>()
-
-    @BeforeEach
-    fun setUp() {
-        mockkObject(HrDepartment)
-    }
 
     @AfterEach
     fun tearDown() {
@@ -36,6 +35,7 @@ internal class HrDepartmentTest {
             HrDepartment.receiveRequest(certificateRequest)
         }
     }
+
     @Test
     fun `second throw NotAllowReceiveRequestException`() {
         assertThrows<NotAllowReceiveRequestException> {
@@ -44,14 +44,16 @@ internal class HrDepartmentTest {
             HrDepartment.receiveRequest(certificateRequest)
         }
     }
+
     @Test
     fun `success push and poll`() {
         HrDepartment.clock = getClock("2022-10-24T10:15:30.00Z") //MONDAY
-        every { certificateRequest.certificateType } returns CertificateType.NDFL
         val hrEmployeeNumber = 1L
-        every { certificateRequest.process(hrEmployeeNumber) } returns certificate
-        HrDepartment.receiveRequest(certificateRequest)
+        mockkObject(Scanner)
+        every { Scanner.getScanData() } returns ByteArray(1)
+        val certificateR = CertificateRequest(hrEmployeeNumber, CertificateType.NDFL)
+        HrDepartment.receiveRequest(certificateR)
         HrDepartment.processNextRequest(hrEmployeeNumber)
-        verify { certificateRequest.process(hrEmployeeNumber) }
+        verify { certificateR.process(hrEmployeeNumber) }
     }
 }

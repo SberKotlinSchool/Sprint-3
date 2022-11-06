@@ -28,6 +28,7 @@ internal class PlayerTest {
         verify { Random.nextInt() }
         assertEquals(10, damage)
     }
+
     @Test
     fun `player damageRoll random blessed`() {
         val player = Player("Test", true)
@@ -36,6 +37,7 @@ internal class PlayerTest {
         verify { Random.nextInt() }
         assertEquals(20, damage)
     }
+
     @Test
     fun `monster damageRoll random`() {
         val monster = Goblin("Goblin1", "true")
@@ -44,6 +46,7 @@ internal class PlayerTest {
         verify { Random.nextInt() }
         assertEquals(5, damage)
     }
+
     @Test
     fun `monster getSalutation check`() {
         val room = Room("Goblin Room")
