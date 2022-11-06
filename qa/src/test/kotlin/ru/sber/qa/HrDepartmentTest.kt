@@ -105,28 +105,4 @@ internal class HrDepartmentTest {
         verify(exactly = 1) { certificateRequest2.process(hrEmployeeNumber) }
     }
 
-//    @ParameterizedTest(name = "Given{0}DayOfWeek_WhenReceiveRequest_thenIncomeBox")
-//    @EnumSource(names = ["MONDAY", "WEDNESDAY", "FRIDAY"])
-//    fun receiveRequestNdflCertificateTypeSuccessTest(
-//        dayOfWeek: DayOfWeek
-//    ) {
-//        mockkConstructor(LinkedList::class)
-//        mockkObject(HrDepartment)
-//        lateinit var certReq: CertificateRequest
-//        every {
-//            anyConstructed<LinkedList<CertificateRequest>>().push(any())
-//        } answers {
-//            certReq = it.invocation.args[0] as CertificateRequest
-//        }
-//        HrDepartment.clock = getDayOfWeekClock(dayOfWeek)
-//        val certRequest = CertificateRequest(Random.nextLong(), NDFL)
-//        HrDepartment.receiveRequest(certificateRequest = certRequest)
-//
-//        unmockkObject(HrDepartment)
-//        unmockkConstructor(LinkedList::class)
-//
-//        Assertions.assertEquals(certRequest, certReq)
-//
-//    }
-
 }
