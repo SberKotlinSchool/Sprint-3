@@ -38,4 +38,6 @@ class Goblin(override val powerType: String, override var healthPoints: Int)
                get() = super.damageRoll/2
 }
 
+fun Monster.getSalutation() = "Salut!"
+
 

@@ -14,6 +14,7 @@ class RoomTest {
     fun testBase() {
         assertEquals(roomSize, room.size)
         assertEquals(roomName , room.name)
+        assertEquals("Salut!" , room.load())
         assertEquals(1000, townSquare.size)
         assertEquals("Town Square", townSquare.name)
     }
