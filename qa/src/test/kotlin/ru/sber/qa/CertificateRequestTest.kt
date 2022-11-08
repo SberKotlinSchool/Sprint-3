@@ -2,6 +2,7 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockkObject
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,6 +22,7 @@ internal class CertificateRequestTest {
 
         val actual = certificateRequest.process(processedBy)
 
+        verify { Scanner.getScanData() }
         assertEquals(certificateRequest, actual.certificateRequest)
         assertEquals(processedBy, actual.processedBy)
         assertEquals(data, actual.data)
