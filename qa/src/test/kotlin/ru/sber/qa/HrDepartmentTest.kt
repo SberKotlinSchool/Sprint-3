@@ -4,6 +4,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -21,7 +22,7 @@ import java.util.*
 import java.util.stream.Stream
 
 internal class HrDepartmentTest {
-    @MockK
+    @MockK(relaxed = true)
     lateinit var certificateRequest: CertificateRequest
 
     private val hrNumber = 1L
@@ -46,8 +47,9 @@ internal class HrDepartmentTest {
     fun setUp() {
         MockKAnnotations.init(this)
         mockkStatic("java.time.LocalDateTime")
+        mockkObject(Scanner)
 
-        every { certificateRequest.process(hrNumber) } returns Certificate(certificateRequest, hrNumber, byteArrayOf(1))
+        every { Scanner.getScanData() } returns byteArrayOf(1)
     }
 
     @AfterEach
