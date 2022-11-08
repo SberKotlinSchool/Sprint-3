@@ -27,7 +27,7 @@ internal class ScannerTest {
     @Test
     fun getScanDataReturnByteArray() {
         val expected = byteArrayOf(1)
-        every { Random.nextLong(5000L, 15000L) } returns 6000L
+        every { Random.nextLong(5000L, 15000L) } returns (Scanner.SCAN_TIMEOUT_THRESHOLD * 0.9).toLong()
         every { Random.nextBytes(100) } returns expected
 
         var actual = Scanner.getScanData()
@@ -37,7 +37,7 @@ internal class ScannerTest {
 
     @Test
     fun getScanDataThrowsScanTimeoutException(){
-        every { Random.nextLong(5000L, 15000L) } returns 11000L
+        every { Random.nextLong(5000L, 15000L) } returns (Scanner.SCAN_TIMEOUT_THRESHOLD * 1.1).toLong()
 
         assertThrows<ScanTimeoutException> { Scanner.getScanData() }
     }
