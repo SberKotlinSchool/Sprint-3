@@ -29,18 +29,20 @@ internal class HrDepartmentTest {
 
     companion object {
         @JvmStatic
-        fun positiveTypeAndDaySequence(): Stream<Arguments> = Arrays.stream(DayOfWeek.values())
-            .filter { it.ordinal < 5 }
-            .map {
-                Arguments.of(it, if (it.ordinal % 2 == 0) CertificateType.NDFL else CertificateType.LABOUR_BOOK)
-            }
+        fun positiveTypeAndDaySequence() = generateEvenOrOddSequenceOfTypeAndDay(0)
 
         @JvmStatic
-        fun negativeTypeAndDaySequence(): Stream<Arguments> = Arrays.stream(DayOfWeek.values())
-            .filter { it.ordinal < 5 }
-            .map {
-                Arguments.of(it, if (it.ordinal % 2 == 1) CertificateType.NDFL else CertificateType.LABOUR_BOOK)
-            }
+        fun negativeTypeAndDaySequence() = generateEvenOrOddSequenceOfTypeAndDay(1)
+
+        private fun generateEvenOrOddSequenceOfTypeAndDay(moduloByTwo: Int = 1): Stream<Arguments> =
+            Arrays.stream(DayOfWeek.values())
+                .filter { it.ordinal < 5 }
+                .map {
+                    Arguments.of(
+                        it,
+                        if (it.ordinal % 2 == moduloByTwo) CertificateType.NDFL else CertificateType.LABOUR_BOOK
+                    )
+                }
     }
 
     @BeforeEach
