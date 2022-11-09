@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import ru.sber.qa.*
+import ru.sber.qa.exception.NotAllowReceiveRequestException
+import ru.sber.qa.exception.WeekendDayException
 import ru.sber.qa.model.Certificate
 import ru.sber.qa.model.CertificateRequest
 import ru.sber.qa.model.CertificateType
@@ -42,7 +44,7 @@ internal class HrDepartmentTest {
         val clock = getClock(day)
         hrDepartment.clock = clock
 
-        assertFailsWith<Exception> { hrDepartment.receiveRequest(CertificateRequest(1L, CertificateType.NDFL)) }
+        assertFailsWith<WeekendDayException> { hrDepartment.receiveRequest(CertificateRequest(1L, CertificateType.NDFL)) }
     }
 
     @ParameterizedTest(name = "#{index} - day {0}, type {1}")
@@ -68,7 +70,7 @@ internal class HrDepartmentTest {
             Arguments.of(MONDAY, CertificateType.NDFL),
             Arguments.of(WEDNESDAY, CertificateType.NDFL),
             Arguments.of(FRIDAY, CertificateType.NDFL),
-            Arguments.of(THURSDAY, CertificateType.LABOUR_BOOK),
+            Arguments.of(TUESDAY, CertificateType.LABOUR_BOOK),
             Arguments.of(THURSDAY, CertificateType.LABOUR_BOOK),
         )
     }
@@ -80,7 +82,7 @@ internal class HrDepartmentTest {
         val clock = getClock(day)
         hrDepartment.clock = clock
 
-        assertFailsWith<Exception> { hrDepartment.receiveRequest(CertificateRequest(1L, certType)) }
+        assertFailsWith<NotAllowReceiveRequestException> { hrDepartment.receiveRequest(CertificateRequest(1L, certType)) }
     }
 
     private fun receiveRequestNotAllowReceiveRequestExceptionTestArguments(): Stream<Arguments> {
@@ -88,7 +90,7 @@ internal class HrDepartmentTest {
             Arguments.of(MONDAY, CertificateType.LABOUR_BOOK),
             Arguments.of(WEDNESDAY, CertificateType.LABOUR_BOOK),
             Arguments.of(FRIDAY, CertificateType.LABOUR_BOOK),
-            Arguments.of(THURSDAY, CertificateType.NDFL),
+            Arguments.of(TUESDAY, CertificateType.NDFL),
             Arguments.of(THURSDAY, CertificateType.NDFL),
         )
     }
