@@ -4,8 +4,10 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
+import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.BeforeEach
@@ -15,10 +17,13 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Arrays
+import java.util.LinkedList
 import java.util.stream.Stream
 
 internal class HrDepartmentTest {
@@ -79,14 +84,32 @@ internal class HrDepartmentTest {
 
     @ParameterizedTest
     @MethodSource("positiveTypeAndDaySequence")
-    fun `given correct CertificateType for dayOfWeek when receiveRequest and processNextRequest then no Exceptions thrown`(
+    fun `given correct CertificateType for dayOfWeek when processNextRequest then no Exceptions thrown`(
         dayOfWeek: DayOfWeek, certificateType: CertificateType
     ) {
+        val injectingIncomeBox = LinkedList<CertificateRequest>()
+        injectingIncomeBox.push(certificateRequest)
+        injectValueToHrDepartment("incomeBox", injectingIncomeBox)
+
+        val injectingOutcomeBox = mockk<LinkedList<Certificate>>(relaxed = true)
+        injectValueToHrDepartment("outcomeBox", injectingOutcomeBox)
+
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
         every { certificateRequest.certificateType } returns certificateType
 
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }
         assertDoesNotThrow { HrDepartment.processNextRequest(hrNumber) }
+        verify { injectingOutcomeBox.push(ofType(Certificate::class)) }
+    }
+
+    private fun injectValueToHrDepartment(fieldNameForInjection: String, injectedValue: Any) {
+        val field = HrDepartment::class.java.getDeclaredField(fieldNameForInjection)
+        field.isAccessible = true
+
+        val modifiers = Field::class.java.getDeclaredField("modifiers")
+        modifiers.isAccessible = true
+        modifiers.setInt(field, field.modifiers and Modifier.FINAL.inv())
+
+        field.set(HrDepartment, injectedValue)
     }
 
     @Test
