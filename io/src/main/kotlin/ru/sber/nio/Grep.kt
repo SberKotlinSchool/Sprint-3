@@ -1,9 +1,20 @@
 package ru.sber.nio
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.appendText
+import kotlin.io.path.name
+import java.nio.file.FileAlreadyExistsException
+
 /**
  * Реализовать простой аналог утилиты grep с использованием калссов из пакета java.nio.
  */
+
 class Grep {
+
+    private val dirPath: String = System.getProperty("user.dir") //Системный путь проекта
+
     /**
      * Метод должен выполнить поиск подстроки subString во всех файлах каталога logs.
      * Каталог logs размещен в данном проекте (io/logs) и внутри содержит другие каталоги.
@@ -14,7 +25,30 @@ class Grep {
      * Пример для подстроки "22/Jan/2001:14:27:46":
      * 22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
      */
-    fun find(subString: String) {
 
+
+    fun find(subString: String) {
+        val pathDir: Path = Paths.get("$dirPath/logs")
+        val resultPath: Path = Paths.get("$dirPath/result.txt")
+        val resultTxt = try {
+            Files.createFile(resultPath)
+        } catch (ex: FileAlreadyExistsException) {
+            Files.delete(resultPath)
+            Files.createFile(resultPath)
+        }
+        val listFiles : MutableList<Path> = mutableListOf()
+        Files.walk(pathDir).filter { it.toString().endsWith(".log") }.forEach { listFiles.add(it) }
+        for (f in listFiles) {
+            val thisList : MutableList<String> = mutableListOf()
+            Files.lines(f).forEach { thisList.add(it) }
+            val nameFiles = f.name
+            for (text in thisList.filter { it.uppercase().contains(subString.uppercase()) }) {
+                //Начинаем не с позиции 0, а с 1й
+                val indexLine: String = (thisList.indexOf(text) + 1).toString()
+                val bestLine = "$nameFiles : $indexLine : $text \n"
+                resultTxt.appendText(bestLine)
+            }
+        }
     }
+
 }
