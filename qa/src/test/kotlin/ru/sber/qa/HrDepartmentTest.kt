@@ -4,19 +4,22 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.Test
 import java.text.SimpleDateFormat
 import org.junit.jupiter.api.assertThrows
 import java.time.*
 import java.util.*
-
+import kotlin.test.assertEquals
 
 
 internal class HrDepartmentTest {
 
-    //Список верных вариантов
+    private val weekendlist: MutableList<Clock> = mutableListOf()
+    private val alldayList: MutableList<Clock> = mutableListOf()
 
+    //Список верных вариантов
 
     //Список вариантов переменной clock
     fun clock_value(x: Int): Clock {
@@ -26,207 +29,118 @@ internal class HrDepartmentTest {
         return Clock.fixed(Instant.parse(formatter.format(calendar.time)), ZoneId.of("Europe/Moscow"))
     }
 
-    //Очищаем список mockk
 
+    //Передаем входящие данные в виде двух списков
+    @BeforeEach
+    fun startValue() {
+        //Список выходных
+        for (f in 1..7) {
+            if (f == 1 || f == 7) {
+                weekendlist.add(clock_value(f))
+            } else {
+                alldayList.add(clock_value(f))
+            }
+        }
+    }
+
+
+    //Очищаем список mockk
     @AfterEach
-    fun tearDown() {unmockkAll()}
+    fun tearDown() {
+        unmockkAll()
+    }
 
     //--------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------
     // Тест функции receiveRequest
 
 
-
     //--------------------------------------------------------------------------------------
     //Проверяем на возможную ошибку в части условий - WeekendDayException (2 дня отдельно)
-
     @Test
-    fun SUNDAY_WeekendDayException_Test() {
-        val clock = clock_value(1) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
-    }
-
-
-    @Test
-    fun SATURDAY_WeekendDayException_Test() {
-        val clock = clock_value(7) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
+    fun WeekendDayException_Test() {
+        for (f in weekendlist) {
+            val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную
+            every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
+            HrDepartment.clock = f // Меняем var-день недели
+            assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
         }
+
+    }
 
     //--------------------------------------------------------------------------------------
     //Проверяем на возможную ошибку в части условий - NotAllowReceiveRequestException (5 дней отдельно)
-
     @Test
-    fun MONDAY_NotAllowReceiveRequestException_Test() {
-        val clock = clock_value(2) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
-    }
-    @Test
-    fun WEDNESDAY_NotAllowReceiveRequestException_Test() {
-        val clock = clock_value(4) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
-    }
-    @Test
-    fun FRIDAY_NotAllowReceiveRequestException_Test() {
-        val clock = clock_value(6) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
-    }
-
-    @Test
-    fun TUESDAY_NotAllowReceiveRequestException_Test() {
-        val clock = clock_value(3) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
-    }
-
-    @Test
-    fun THURSDAY_NotAllowReceiveRequestException_Test() {
-        val clock = clock_value(5) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock // Меняем var-день недели
-        assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
+    fun NotAllowReceiveRequestException_Test() {
+        for (f in alldayList) {
+            val dayOfWeek_need = LocalDateTime.now(f).dayOfWeek
+            if (dayOfWeek_need in listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)) {
+                val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
+                every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
+                HrDepartment.clock = f // Меняем var-день недели
+                assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
+            }
+            if (dayOfWeek_need in listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY)) {
+                val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
+                every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
+                HrDepartment.clock = f // Меняем var-день недели
+                assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) } //Проверяем конкретную ошибку
+            }
+        }
     }
 
     //--------------------------------------------------------------------------------------
     //Проверяем на другие ошибки
-    @Test
-    fun MONDAY_Done_Test() {
-        val clock = clock_value(2) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
-    }
 
     @Test
-    fun WEDNESDAY_Done_Test() {
-        val clock = clock_value(4) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
+    fun Done_Test() {
+        for (f in alldayList) {
+            val dayOfWeek_need = LocalDateTime.now(f).dayOfWeek
+            if (dayOfWeek_need in listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)) {
+                val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
+                every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
+                HrDepartment.clock = f
+                assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
+            }
+            if (dayOfWeek_need in listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY)) {
+                val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
+                every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
+                HrDepartment.clock = f
+                assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
+            }
+        }
     }
 
-    @Test
-    fun FRIDAY_Done_Test() {
-        val clock = clock_value(6) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную NDFL
-        every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной
-        HrDepartment.clock = clock
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
-    }
-
-    @Test
-    fun TUESDAY_Done_Test() {
-        val clock = clock_value(3) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
-        HrDepartment.clock = clock
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
-    }
-
-    @Test
-    fun THURSDAY_Done_Test() {
-        val clock = clock_value(5) // Определяем день недели
-        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную LABOUR_BOOK
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной
-        HrDepartment.clock = clock
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }  // Проверяем другие ошибки
-    }
 
     //--------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------
     // Тест функции processNextRequest
 
-
-    //--------------------------------------------------------------------------------------
-    //Проверяем на ошибки NDFL
     @Test
-    fun NextRequest_NDFL_Test() {
-        var counts: Int = 0
-        //Проверяем 15 рандомных цифр
-        while (counts < 15) {
-            val processNextRequest: Long = (1..123L).random() //Рандомное число
-            val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную
-            HrDepartment.clock = clock_value(6) //FRIDAY
-            every { certificateRequest.certificateType } returns CertificateType.NDFL // Присваиваем тип переменной NDFL
-            every { certificateRequest.process(processNextRequest) } returns mockk() //Присваиваем под текущую цифру процесс
-            HrDepartment.receiveRequest(certificateRequest)
-            assertDoesNotThrow { HrDepartment.processNextRequest(processNextRequest) }  // Проверяем другие ошибки
-            counts += 1
-        }
-    }
-    //--------------------------------------------------------------------------------------
-    //Проверяем на ошибки LABOUR_BOOK
-    @Test
-    fun NextRequest_LABOUR_BOOK_Test() {
-        var counts: Int = 0
-        //Проверяем 15 рандомных цифр
-        while (counts < 15){
-            val processNextRequest: Long = (1..123L).random() //Рандомное число
-            val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную
-            HrDepartment.clock = clock_value(3) // TUESDAY
-            every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK // Присваиваем тип переменной LABOUR_BOOK
-            every { certificateRequest.process(processNextRequest) } returns mockk()
-            HrDepartment.receiveRequest(certificateRequest)
-            assertDoesNotThrow { HrDepartment.processNextRequest(processNextRequest) }  // Проверяем другие ошибки
-            counts +=1
-        }
-    }
+    fun NextRequest_Test() {
+        val processNextRequest: Long = (1..123L).random() //Рандомное число
+        val certificateRequest: CertificateRequest = mockk() // Формируем пустышку-переменную
+        val needCertificate = mockk<Certificate>()
+        every { certificateRequest.process(processNextRequest) } returns needCertificate //Присваиваем под текущую цифру процесс
+        val incomeBox: LinkedList<CertificateRequest> = LinkedList() //Копия переменной incomeBox из HrDepartment
+        val outcomeOutcome: LinkedList<Certificate> = LinkedList() //Копия переменной outcomeOutcome из HrDepartment
+        val incomeBoxCopy: LinkedList<CertificateRequest> //Вариант для рефлексии (входящий)
+        HrDepartment.javaClass.getDeclaredField("incomeBox").let {
+            it.isAccessible = true
+            incomeBoxCopy = it.get(incomeBox) as LinkedList<CertificateRequest>
+        } //Сама рефлексия (входящий)
 
+        incomeBoxCopy.push(certificateRequest)
+
+        val outcomeOutcomeCopy: LinkedList<Certificate> //Вариант для рефлексии (исходящий)
+        HrDepartment.javaClass.getDeclaredField("outcomeOutcome").let {
+            it.isAccessible = true
+            outcomeOutcomeCopy = it.get(outcomeOutcome) as LinkedList<Certificate>
+        } //Сама рефлексия (исходящий)
+
+        assertDoesNotThrow { HrDepartment.processNextRequest(processNextRequest) }  // Проверяем другие ошибки
+        assertEquals(needCertificate, outcomeOutcomeCopy.first) //Проверка результата
+    }
 }
-
-
-
-
-    /*
-    fun clock_value(): MutableList<Clock> {
-        val calendar = Calendar.getInstance()
-        val listClock: MutableList<Clock> = mutableListOf()
-        for (f in 0..6) {
-            val formatter = SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'")
-            if (f != 0){calendar.add(Calendar.DATE, 1)}
-            var dates: Clock = Clock.fixed(Instant.parse(formatter.format(calendar.time)), ZoneId.of("Europe/Moscow"))
-            listClock.add(dates)
-        }
-        return listClock
-    }
-    @Test
-    fun Test_receiveRequest() {
-        val certificateNDFL: CertificateRequest = mockk()
-        val certificateLABOUR_BOOK: CertificateRequest = mockk()
-        val clock = clock_value()
-        val HrDepartment_copy: HrDepartment
-        HrDepartment_copy = spyk()
-        every { certificateNDFL.certificateType } returns CertificateType.NDFL
-        every { certificateLABOUR_BOOK.certificateType } returns CertificateType.LABOUR_BOOK
-        for (days_week in clock) {
-                val certificateRequest = certificateLABOUR_BOOK
-                HrDepartment.clock = days_week
-                assertThrows<NotAllowReceiveRequestException> { HrDepartment.receiveRequest(certificateRequest) }
-            }
-        }
-
-    }
-
-     */
 
 

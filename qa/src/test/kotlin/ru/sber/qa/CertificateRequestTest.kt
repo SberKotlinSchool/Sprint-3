@@ -24,15 +24,14 @@ internal class CertificateRequestTest {
         every { Scanner.getScanData() } returns ByteArray_test //Задаём результат функции
         var counts: Int = 0
 
-        //Проверяем 15 рандомных входов
-        while (counts < 15) {
-            val hremployeenumber: Long = (1..3500L).random() //Случайная цифра
-            val now_result = bestRequest.process(hrEmployeeNumber = hremployeenumber) //Задаём результат функции
-            assertEquals(now_result.certificateRequest, bestRequest) //Проверка переменной certificateRequest
-            assertEquals(now_result.processedBy, hremployeenumber) //Проверка переменной processedBy
-            assertEquals(now_result.data, ByteArray_test) //Проверка переменной data
-            counts +=1
-        }
-        verify (exactly = 15) { Scanner.getScanData() } //Проверка, что было обращение к функции внутри тестируемого кода
+
+
+        val hremployeenumber: Long = (1..3500L).random() //Случайная цифра
+        val now_result = bestRequest.process(hrEmployeeNumber = hremployeenumber) //Задаём результат функции
+        assertEquals(now_result.certificateRequest, bestRequest) //Проверка переменной certificateRequest
+        assertEquals(now_result.processedBy, hremployeenumber) //Проверка переменной processedBy
+        assertEquals(now_result.data, ByteArray_test) //Проверка переменной data
+
+        verify () { Scanner.getScanData() } //Проверка, что было обращение к функции внутри тестируемого кода
     }
 }
