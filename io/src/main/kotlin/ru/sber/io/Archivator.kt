@@ -46,6 +46,7 @@ class Archivator {
         val destination = File(unZipFileName)
         val buffer = ByteArray(1024)
         val zipInputStream = ZipInputStream(FileInputStream(zipFileName))
+        zipInputStream.getNextEntry()
         val fos = destination.outputStream()
         var length: Int
         while (zipInputStream.read(buffer).also { length = it } > 0) {
