@@ -2,6 +2,7 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -9,6 +10,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.util.*
 
 internal class HrDepartmentTest {
 
@@ -45,9 +47,33 @@ internal class HrDepartmentTest {
     }
 
     @Test
-    fun processNextRequestTest() {
+    fun processNextRequestTestException() {
         assertThrows<NullPointerException> {
             HrDepartment.processNextRequest(1L)
         }
+    }
+
+    @Test
+    fun processNextRequestTestSuccess() {
+        val certificateRequest: CertificateRequest = mockk()
+        val certificate: Certificate = mockk()
+        every { certificateRequest.process(1L) } returns certificate
+        val outcomeOutcome: LinkedList<Certificate> = LinkedList()
+        val incomeBox: LinkedList<CertificateRequest> = LinkedList()
+        var incomeBoxLocal: LinkedList<CertificateRequest>
+        HrDepartment.javaClass.getDeclaredField("incomeBox").let {
+            it.isAccessible = true
+            incomeBoxLocal = it.get(incomeBox) as LinkedList<CertificateRequest>
+        }
+        var outcomeOutcomeLocal: LinkedList<Certificate>
+        HrDepartment.javaClass.getDeclaredField("outcomeOutcome").let {
+            it.isAccessible = true
+            outcomeOutcomeLocal = it.get(outcomeOutcome) as LinkedList<Certificate>
+        }
+        incomeBoxLocal.add(certificateRequest)
+
+        HrDepartment.processNextRequest(1L)
+
+        assertEquals(certificate, outcomeOutcomeLocal[0])
     }
 }

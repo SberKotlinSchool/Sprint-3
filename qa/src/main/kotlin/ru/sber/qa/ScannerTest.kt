@@ -2,6 +2,7 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockkObject
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,6 +28,7 @@ internal class ScannerTest {
         every { Random.nextLong(any(), any()) } returns 1000L
         every { Random.nextBytes(100) } returns result
         val actual = Scanner.getScanData()
+        verify { Scanner.getScanData() }
         assertEquals(result, actual)
     }
 }
