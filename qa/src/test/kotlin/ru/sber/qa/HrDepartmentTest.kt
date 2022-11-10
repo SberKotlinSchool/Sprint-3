@@ -7,6 +7,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.lang.IllegalArgumentException
 import java.lang.reflect.Field
 import java.time.*
 import java.util.*
@@ -52,7 +53,7 @@ class HrDepartmentTest {
     fun testReceiveRequest(type: CertificateType, instant: Instant) {
         HrDepartment.clock = Clock.fixed(instant, ZoneId.of("UTC"))
         every { certRequestMock.certificateType } returns type
-        val incomeBox = getIncomeBoxProperty().get(HrDepartment) as LinkedList<CertificateRequest>
+        val incomeBox = getIncomeBox()
         val incomeBoxCountIn = incomeBox.count()
         HrDepartment.receiveRequest(certRequestMock)
         val incomeBoxCountOut = incomeBox.count()
@@ -69,16 +70,16 @@ class HrDepartmentTest {
         val instant = LocalDateTime.of(2022, 10, 31, 15, 8, 0).toInstant(ZoneOffset.UTC)
         HrDepartment.clock = Clock.fixed(instant, ZoneId.of("UTC"))
         every { certRequestMock.certificateType } returns CertificateType.NDFL
-        val incomeBox = getIncomeBoxProperty().get(HrDepartment) as LinkedList<CertificateRequest>
+        val incomeBox = getIncomeBox()
         incomeBox.push(certRequestMock)
         HrDepartment.processNextRequest(employeeNumber)
         verify(exactly = 1) { certRequestMock.process(employeeNumber) }
     }
 
-    private fun getIncomeBoxProperty(): Field {
+    private fun getIncomeBox(): LinkedList<CertificateRequest> {
         val prop = HrDepartment.javaClass.getDeclaredField("incomeBox")
         prop.isAccessible = true
-        return prop
+        return prop.get(HrDepartment) as? LinkedList<CertificateRequest> ?: throw IllegalArgumentException()
     }
 
 }
