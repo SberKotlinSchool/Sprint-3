@@ -2,6 +2,7 @@ package ru.sber.qa.model
 
 import io.mockk.every
 import io.mockk.mockkObject
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.DisplayName
@@ -23,6 +24,7 @@ internal class CertificateRequestTest {
 
         val certificateRequest = CertificateRequest(emplNumber, CertificateType.LABOUR_BOOK)
         val actual = certificateRequest.process(hrNumber)
+        verify { Scanner.getScanData() }
 
         assertNotNull(actual)
         assertEquals(certificateRequest.certificateType, actual.certificateRequest.certificateType)
