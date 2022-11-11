@@ -1,9 +1,14 @@
-package ru.sber.qa
+package ru.sber.qa.component
 
+import ru.sber.qa.exception.NotAllowReceiveRequestException
+import ru.sber.qa.exception.WeekendDayException
+import ru.sber.qa.model.Certificate
+import ru.sber.qa.model.CertificateRequest
+import ru.sber.qa.model.CertificateType
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.util.LinkedList
+import java.util.*
 
 /**
  * Отдел кадров.
@@ -11,11 +16,10 @@ import java.util.LinkedList
 object HrDepartment {
     var clock = Clock.systemUTC()
     private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
-    private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
+    private val outcomeBox: LinkedList<Certificate> = LinkedList()
 
     /**
      * Получение запроса на изготовление справки.
-     *
      */
     fun receiveRequest(certificateRequest: CertificateRequest) {
         val currentDayOfWeek = LocalDateTime.now(clock).dayOfWeek
@@ -36,6 +40,6 @@ object HrDepartment {
     fun processNextRequest(hrEmployeeNumber: Long) {
         val certificateRequest = incomeBox.poll()
         val certificate = certificateRequest.process(hrEmployeeNumber)
-        outcomeOutcome.push(certificate)
+        outcomeBox.push(certificate)
     }
 }

@@ -1,4 +1,6 @@
-package ru.sber.qa
+package ru.sber.qa.model
+
+import ru.sber.qa.component.Scanner
 
 /**
  * Запрос на изготовление справки.

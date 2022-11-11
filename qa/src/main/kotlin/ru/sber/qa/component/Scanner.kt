@@ -1,5 +1,6 @@
-package ru.sber.qa
+package ru.sber.qa.component
 
+import ru.sber.qa.exception.ScanTimeoutException
 import kotlin.random.Random
 
 object Scanner {
