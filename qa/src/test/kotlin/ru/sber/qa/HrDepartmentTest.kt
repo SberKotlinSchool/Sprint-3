@@ -87,18 +87,19 @@ internal class HrDepartmentTest {
     fun `given correct CertificateType for dayOfWeek when processNextRequest then no Exceptions thrown`(
         dayOfWeek: DayOfWeek, certificateType: CertificateType
     ) {
-        val injectingIncomeBox = LinkedList<CertificateRequest>()
-        injectingIncomeBox.push(certificateRequest)
-        injectValueToHrDepartment("incomeBox", injectingIncomeBox)
+        val incomeBox = LinkedList<CertificateRequest>()
+        incomeBox.push(certificateRequest)
+        injectValueToHrDepartment("incomeBox", incomeBox)
 
-        val injectingOutcomeBox = mockk<LinkedList<Certificate>>(relaxed = true)
-        injectValueToHrDepartment("outcomeBox", injectingOutcomeBox)
+        val outcomeBox = mockk<LinkedList<Certificate>>(relaxed = true)
+        injectValueToHrDepartment("outcomeBox", outcomeBox)
 
         every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
         every { certificateRequest.certificateType } returns certificateType
 
         assertDoesNotThrow { HrDepartment.processNextRequest(hrNumber) }
-        verify { injectingOutcomeBox.push(ofType(Certificate::class)) }
+        verify { certificateRequest.process(hrNumber) }
+        verify { outcomeBox.push(ofType(Certificate::class)) }
     }
 
     private fun injectValueToHrDepartment(fieldNameForInjection: String, injectedValue: Any) {
