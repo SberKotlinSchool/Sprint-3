@@ -7,13 +7,13 @@ data class User(val name: String, val age: Long) {
         if (this === other) return true
         if (other == null || other !is User)
             return false
-        if (city == null || other.city == null)
+        if (!this::city.isInitialized || !other::city.isInitialized)
             return false
         return name == other.name && age == other.age && city == other.city
     }
 
     override fun hashCode(): Int =
-        (name.hashCode() * 31 + age.toInt()) * 31 + (if (city != null) city.hashCode() else 0)
+        (name.hashCode() * 31 + age.toInt()) * 31 + (if (this::city.isInitialized) city.hashCode() else 0)
 
 }
 
