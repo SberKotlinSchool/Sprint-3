@@ -8,10 +8,6 @@ import kotlin.io.path.deleteIfExists
  */
 class Grep {
 
-    companion object {
-
-    }
-
     /**
      * Метод должен выполнить поиск подстроки subString во всех файлах каталога logs.
      * Каталог logs размещен в данном проекте (io/logs) и внутри содержит другие каталоги.
