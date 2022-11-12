@@ -6,12 +6,12 @@ import io.mockk.impl.annotations.SpyK
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 import kotlin.test.assertFailsWith
 
+@SuppressWarnings("unchecked", "deprecated")
 internal class HrDepartmentTest {
 
     private val hrDepartment = HrDepartment
@@ -31,7 +31,7 @@ internal class HrDepartmentTest {
     }
 
     @Test
-    fun receiveRequest() {
+    fun receiveRequest1() {
         hrDepartment.clock = Clock.fixed(
             Instant.parse("2022-10-30T10:15:30.00Z"), ZoneId.of("Asia/Yerevan"))
 
@@ -39,18 +39,14 @@ internal class HrDepartmentTest {
                         block =  {
                             hrDepartment.receiveRequest(cr1)
                         })
+    }
+    @Test
+    fun receiveRequest2() {
+        hrDepartment.clock = Clock.fixed(
+            Instant.parse("2022-11-01T10:15:30.00Z"), ZoneId.of("Asia/Yerevan"))
         assertFailsWith(exceptionClass =  NotAllowReceiveRequestException::class,
             block =  {
-                throw NotAllowReceiveRequestException()
+                hrDepartment.receiveRequest(cr1)
             })
-    }
-
-    @Test
-    fun processNextRequest() {
-
-        hrDepartment.clock = Clock.fixed(
-            Instant.parse("2022-10-31T10:15:30.00Z"), ZoneId.of("Asia/Yerevan"))
-        hrDepartment.receiveRequest(cr1)
-        hrDepartment.processNextRequest(1)
     }
 }
