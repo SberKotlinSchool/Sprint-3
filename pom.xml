@@ -17,7 +17,9 @@
         <java.version>1.8</java.version>
         <kotlin.version>1.5.20</kotlin.version>
         <junit.jupiter.version>5.7.2</junit.jupiter.version>
+        <mockk.version>1.12.0</mockk.version>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -38,14 +40,19 @@
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk</artifactId>
-            <version>1.12.0</version>
+            <version>${mockk.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+             <artifactId>junit-jupiter-params</artifactId>
+             <version>${junit.jupiter.version}</version>
+             <scope>test</scope>
         </dependency>
     </dependencies>
 
