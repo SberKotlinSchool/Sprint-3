@@ -16,41 +16,29 @@ interface Fightable {
 }
 
 //TODO: create class Player, Monster, Goblin here...
-class Player(val name: String, var isBlessed: Boolean): Fightable{
-    override lateinit var powerType: String
-    override var healthPoints by Delegates.notNull<Int>()
-    override var damageRoll by Delegates.notNull<Int>()
+class Player(val name: String, var isBlessed: Boolean, override var powerType: String, override var healthPoints: Int, override var damageRoll: Int): Fightable{
 
     override fun attack(opponent: Fightable): Int {
         when(isBlessed){
             false -> damageRoll = damageRoll()
             true -> damageRoll = damageRoll()*2
         }
+        healthPoints -= damageRoll
         return damageRoll
     }
 }
 
-abstract class Monster: Fightable{
-    abstract val name: String
-    abstract val description: String
+abstract class Monster(val name: String, val description: String): Fightable{
 
     override fun attack(opponent: Fightable): Int {
         return damageRoll().also { damageRoll = it }
     }
-
-    fun getSalution() = "Hey, I'm a Monster"
-
 }
 
-class Goblin: Monster() {
-    override lateinit var name: String
-    override lateinit var description: String
-    override lateinit var powerType: String
-    override var healthPoints by Delegates.notNull<Int>()
-    override var damageRoll by Delegates.notNull<Int>()
+class Goblin(name: String, description: String, override val powerType: String,
+             override var healthPoints: Int, override var damageRoll: Int): Monster(name, description) {
 
     override fun damageRoll(): Int {
         return super.damageRoll() / 2
     }
-
 }
