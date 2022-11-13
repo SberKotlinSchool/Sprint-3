@@ -9,7 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import ru.sber.qa.*
+import java.lang.reflect.*
 import java.time.*
+import java.util.*
 import kotlin.random.Random
 
 internal class HrDepartmentTest{
@@ -19,60 +21,12 @@ internal class HrDepartmentTest{
     @BeforeEach
     fun setUp() {
         mockkStatic(LocalDateTime::class)
+        mockkObject(Random)
     }
 
-    @ParameterizedTest
-    @MethodSource("receiveRequestWeekendDayExceptionParams")
-    fun testReceiveRequestWeekendDayException(currentDay: DayOfWeek) {
-        // given
-        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
-        // result
-        assertThrows(WeekendDayException::class.java) { HrDepartment.receiveRequest(certificateRequest) }
-    }
-
-    @ParameterizedTest
-    @MethodSource("receiveRequestNotAllowReceiveRequestExceptionParams")
-    fun testReceiveRequestNotAllowReceiveRequestException(currentDay: DayOfWeek, certificateType: CertificateType) {
-        // given
-        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
-        every { certificateRequest.certificateType } returns certificateType
-        // result
-        assertThrows(NotAllowReceiveRequestException::class.java) { HrDepartment.receiveRequest(certificateRequest) }
-    }
-
-    @ParameterizedTest
-    @MethodSource("receiveRequestParams")
-    fun testReceiveRequest(currentDay: DayOfWeek, certificateType: CertificateType) {
-        // given
-        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
-        every { certificateRequest.certificateType } returns certificateType
-        // result
-        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }
-    }
-
-    @ParameterizedTest
-    @MethodSource("processNextRequestParams")
-    fun testProcessNextRequest(currentDay: DayOfWeek, certificateType: CertificateType, hrEmployeeNumber: Long) {
-        // given
-        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
-        every { certificateRequest.certificateType } returns certificateType
-        every { certificateRequest.process(hrEmployeeNumber) } returns certificate
-        // when
-        HrDepartment.receiveRequest(certificateRequest)
-        // result
-        assertDoesNotThrow { HrDepartment.processNextRequest(hrEmployeeNumber) }
-    }
-
-    @Test
-    fun testProcessNextRequestToThrowNullPointerException(){
-        //result
-        assertThrows(NullPointerException::class.java) { HrDepartment.processNextRequest(2L) }
-    }
-
-    @Test
-    fun testProcessNextRequestToThrowNullPointerExceptionWithText() {
-        val exception: Exception = assertThrows(NullPointerException::class.java) { HrDepartment.processNextRequest(2L) }
-        assertEquals("Сперва прошу убедиться, что имеются запросы на изготовление справки", exception.message)
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
     }
 
     companion object {
@@ -110,9 +64,67 @@ internal class HrDepartmentTest{
         )
     }
 
-    @AfterEach
-    fun tearDown() {
-        unmockkAll()
+    @ParameterizedTest
+    @MethodSource("receiveRequestWeekendDayExceptionParams")
+    fun testReceiveRequestWeekendDayException(currentDay: DayOfWeek) {
+        // given
+        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
+        // result
+        assertThrows(WeekendDayException::class.java) { HrDepartment.receiveRequest(certificateRequest) }
     }
 
+    @ParameterizedTest
+    @MethodSource("receiveRequestNotAllowReceiveRequestExceptionParams")
+    fun testReceiveRequestNotAllowReceiveRequestException(currentDay: DayOfWeek, certificateType: CertificateType) {
+        // given
+        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
+        every { certificateRequest.certificateType } returns certificateType
+        // result
+        assertThrows(NotAllowReceiveRequestException::class.java) { HrDepartment.receiveRequest(certificateRequest) }
+    }
+
+    @ParameterizedTest
+    @MethodSource("receiveRequestParams")
+    fun testReceiveRequest(currentDay: DayOfWeek, certificateType: CertificateType) {
+        // given
+        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
+        every { certificateRequest.certificateType } returns certificateType
+        // result
+        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequest) }
+    }
+
+    @ParameterizedTest
+    @MethodSource("processNextRequestParams")
+    fun testProcessNextRequest(currentDay: DayOfWeek, certificateType: CertificateType, hrEmployeeNumber: Long) {
+        // given
+        val incomeBoxForReflection: LinkedList<CertificateRequest> = LinkedList()
+        val outcomeOutcomeForReflection: LinkedList<Certificate> = LinkedList()
+        val incomeBox: LinkedList<CertificateRequest>
+        val outcomeOutcome: LinkedList<Certificate>
+
+        every { LocalDateTime.now(Clock.systemUTC()).dayOfWeek } returns currentDay
+        every { certificateRequest.certificateType } returns certificateType
+        every { certificateRequest.process(hrEmployeeNumber) } returns certificate
+        // when
+        HrDepartment::class.java.getDeclaredField("incomeBox").let {field ->
+            field.isAccessible = true
+            incomeBox = field.get(incomeBoxForReflection) as LinkedList<CertificateRequest>
+        }
+
+        incomeBox.push(certificateRequest)
+
+        HrDepartment::class.java.getDeclaredField("outcomeOutcome").let {field ->
+            field.isAccessible = true
+            outcomeOutcome = field.get(outcomeOutcomeForReflection) as LinkedList<Certificate>
+        }
+        // result
+        assertDoesNotThrow { HrDepartment.processNextRequest(hrEmployeeNumber) }
+        assertEquals(certificate, outcomeOutcome[0])
+    }
+
+    @Test
+    fun testProcessNextRequestToThrowNullPointerException(){
+        //result
+        assertThrows(NullPointerException::class.java) { HrDepartment.processNextRequest(2L) }
+    }
 }

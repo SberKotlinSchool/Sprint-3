@@ -1,5 +1,7 @@
 package ru.sber.qa
 
+import kotlin.random.Random
+
 /**
  * Запрос на изготовление справки.
  */

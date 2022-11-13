@@ -19,6 +19,23 @@ internal class ScannerTest {
         mockkObject(Scanner)
     }
 
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
+    }
+
+    companion object{
+        @JvmStatic
+        fun GetScanDataThrowScanTimeoutException_ThreadSleepConstParams() = listOf(
+            Arguments.of(Random.nextLong(10001L, 15000L))
+        )
+
+        @JvmStatic
+        fun GetScanDataDoesNotThrow_ThreadSleepRandomParams() = listOf(
+            Arguments.of(Random.nextLong(5000L, 10000L))
+        )
+    }
+
     @ParameterizedTest
     @MethodSource("GetScanDataThrowScanTimeoutException_ThreadSleepConstParams")
     fun testGetScanDataThrowScanTimeoutException(scanDuration: Long){
@@ -65,26 +82,4 @@ internal class ScannerTest {
             "Не выполнено со scanDuration: $scanDuration"
         )
     }
-
-    companion object{
-        @JvmStatic
-        fun GetScanDataThrowScanTimeoutException_ThreadSleepConstParams() = listOf(
-            Arguments.of(Random.nextLong(10001L, 15000L)),
-            Arguments.of(10001L),
-            Arguments.of(15000L)
-        )
-
-        @JvmStatic
-        fun GetScanDataDoesNotThrow_ThreadSleepRandomParams() = listOf(
-            Arguments.of(Random.nextLong(5000L, 10000L)),
-            Arguments.of(5000L),
-            Arguments.of(10000L)
-        )
-    }
-
-    @AfterEach
-    fun tearDown() {
-        unmockkAll()
-    }
-
 }
