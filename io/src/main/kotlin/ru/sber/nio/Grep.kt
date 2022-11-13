@@ -29,9 +29,12 @@ class Grep {
             }
             .map { file ->
                 file.useLines {
-                    it.filter { str -> str.contains(subString) }
-                        .mapIndexed { i, str ->
-                            file.name + " : $i : " + str
+                    it.mapIndexed { i, str ->
+                        i to str
+                    }
+                        .filter { (_, str) -> str.contains(subString) }
+                        .map { (i, str) ->
+                            "${file.name} : ${i + 1} : $str"
                         }
                         .toList()
                 }
