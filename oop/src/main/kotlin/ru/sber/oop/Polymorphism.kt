@@ -20,10 +20,13 @@ class Player(
         get() = "SuperPower"
 
     override fun attack(opponent: Fightable): Int {
-        if (this.isBlessed)
-            return opponent.healthPoints - this.damageRoll * 2
+        if (this.isBlessed) {
+            opponent.healthPoints -= this.damageRoll * 2
+            return this.damageRoll * 2
+        }
         else {
-            return opponent.healthPoints - this.damageRoll
+            opponent.healthPoints -= this.damageRoll
+            return this.damageRoll
         }
     }
 }
@@ -34,7 +37,8 @@ abstract class Monster(
 ) : Fightable {
 
     override fun attack(opponent: Fightable): Int {
-        return opponent.healthPoints - this.damageRoll * 2
+        opponent.healthPoints -= this.damageRoll * 2
+        return this.damageRoll * 2
     }
 }
 
