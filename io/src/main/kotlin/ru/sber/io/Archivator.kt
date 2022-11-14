@@ -12,7 +12,6 @@ class Archivator {
     private val logFile = File(parentDir, "logfile.log")
     private val zipFile = File(parentDir, "logfile.zip")
     private val unzipFile = File(parentDir, "unzippedLogfile.log")
-    private val bufferSize = 1024
 
     /**
      * Метод, который архивирует файл logfile.log в архив logfile.zip.
@@ -25,7 +24,7 @@ class Archivator {
                     .use { zipOutputStream ->
                         val zipEntry = ZipEntry(logFile.name)
                         zipOutputStream.putNextEntry(zipEntry)
-                        inputStream.copyTo(zipOutputStream, bufferSize)
+                        inputStream.copyTo(zipOutputStream)
                     }
             }
     }
@@ -41,7 +40,7 @@ class Archivator {
                 while (zipInputStream.nextEntry != null) {
                     unzipFile.outputStream()
                         .use { outputStream ->
-                            zipInputStream.copyTo(outputStream, bufferSize)
+                            zipInputStream.copyTo(outputStream)
                         }
                 }
             }
