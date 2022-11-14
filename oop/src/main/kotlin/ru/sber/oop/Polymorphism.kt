@@ -26,7 +26,7 @@ class Player(
             opponent.healthPoints -= currentDamageRoll * 2
             return currentDamageRoll * 2
         } else {
-            opponent.healthPoints -=  currentDamageRoll
+            opponent.healthPoints -= currentDamageRoll
             return currentDamageRoll
         }
     }
@@ -57,18 +57,6 @@ class Goblin(
     override var healthPoints: Int
         get() = 45
         set(value) {}
-}
-
-fun main() {
-    val player1 = Player("first", 100, true)
-    val player2 = Player("second", 100, false)
-
-    val attack = player2.attack(player1);
-
-
-    println("first's health point ${player1.healthPoints}")
-    println("seconds's health point ${player2.healthPoints}")
-    println("attack  $attack")
 }
 
 
