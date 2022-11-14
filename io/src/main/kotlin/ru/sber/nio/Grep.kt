@@ -1,9 +1,16 @@
 package ru.sber.nio
 
+import java.io.File
+import java.io.IOException
+import java.nio.file.*
+import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.useLines
+
+
 /**
- * Реализовать простой аналог утилиты grep с использованием калссов из пакета java.nio.
+ * Реализовать простой аналог утилиты grep с использованием классов из пакета java.nio.
  */
-class Grep {
+open class Grep {
     /**
      * Метод должен выполнить поиск![](../../../../../../../../../../../var/folders/pj/hwj43xhn57z593clmjnz21n00000gn/T/TemporaryItems/NSIRD_screencaptureui_QuHyUS/Screenshot 2022-11-09 at 12.50.14.png) подстроки subString во всех файлах каталога logs.
      * Каталог logs размещен в данном проекте (io/logs) и внутри содержит другие каталоги.
@@ -14,7 +21,28 @@ class Grep {
      * Пример для подстроки "22/Jan/2001:14:27:46":
      * 22-01-2001-1.log : 3 : 192.168.1.1 - - [22/Jan/2001:14:27:46 +0000] "POST /files HTTP/1.1" 200 - "-"
      */
-    fun find(subString: String) {
-
+    open fun find(subString: String) {
+        val sourcePath = Paths.get("/Users/annapopova/ideaProjects/Sprint-3/io/logs")
+        var substringList: List<String>;
+        Files.walkFileTree(sourcePath, object : SimpleFileVisitor<Path>() {
+            @Throws(IOException::class)
+            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                file.useLines { it ->
+                    var currResultList: MutableList<String> = mutableListOf<String>()
+                    var lineNumber = 1
+                    it.forEach {
+                        if (it.contains(subString)) {
+                            currResultList.add(file.fileName.toString())
+                            currResultList.add(lineNumber.toString())
+                            currResultList.add(it.toString())
+                            val joinToString = currResultList.joinToString("  : ")
+                            println("Что получилось в очередной строке $joinToString")
+                        } else
+                            lineNumber++
+                    }
+                }
+                return FileVisitResult.CONTINUE
+            }
+        })
     }
 }
