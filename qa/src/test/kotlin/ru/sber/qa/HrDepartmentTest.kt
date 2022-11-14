@@ -5,6 +5,10 @@ import org.junit.jupiter.api.*
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 fun getClock(time: String): Clock =
     Clock.fixed(Instant.parse(time), ZoneId.of("UTC"))
@@ -46,29 +50,30 @@ class HrDepartmentTest {
         }
     }
 
-    class NestedOne {
-        private val hrEmployeeNumber = 1L
+    @Test
+    fun `success push and poll`() {
+        HrDepartment.clock = getClock("2022-10-24T10:15:30.00Z") //MONDAY
+        val hrEmployeeNumber = 1L
+        mockkObject(Scanner)
+        every { Scanner.getScanData() } returns ByteArray(1)
+        val certificateR = CertificateRequest(hrEmployeeNumber, CertificateType.NDFL)
+        HrDepartment.receiveRequest(certificateR)
+        val incomeBox: LinkedList<*> = getField("incomeBox")
+        val outcomeOutcome: LinkedList<*> = getField("outcomeOutcome")
+        assertNotNull(incomeBox)
+        assertTrue(incomeBox.size == 1)
+        assertEquals(certificateR, incomeBox[0])
 
-        @BeforeEach
-        fun setUp() {
-            HrDepartment.clock = getClock("2022-10-24T10:15:30.00Z") //MONDAY
-            mockkObject(Scanner)
-            every { Scanner.getScanData() } returns ByteArray(1)
-            val certificateR = CertificateRequest(hrEmployeeNumber, CertificateType.NDFL)
-            HrDepartment.receiveRequest(certificateR)
-        }
-
-        @AfterEach
-        fun tearDown() {
-            unmockkAll()
-        }
-
-        @Test
-        fun `success processNextRequest`() {
-            val certificateR = CertificateRequest(hrEmployeeNumber, CertificateType.NDFL)
-            HrDepartment.processNextRequest(hrEmployeeNumber)
-            verify { certificateR.process(hrEmployeeNumber) }
-        }
+        HrDepartment.processNextRequest(hrEmployeeNumber)
+        verify { certificateR.process(hrEmployeeNumber) }
+        assertNotNull(outcomeOutcome)
+        assertTrue(outcomeOutcome.size == 1)
+        assertTrue(incomeBox.size == 0)
     }
+    @Suppress("UNCHECKED_CAST")
+    fun <T> getField(name: String): T = HrDepartment::class.java
+        .getDeclaredField(name)
+        .apply { isAccessible = true }
+        .get(this) as T
 }
 
