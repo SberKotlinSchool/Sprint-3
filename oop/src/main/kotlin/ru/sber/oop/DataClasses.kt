@@ -3,8 +3,9 @@ package ru.sber.oop
 
 data class User(val name: String, val age: Long) {
     lateinit var city: String
+
     override fun equals(other: Any?): Boolean {
-        if (other == null || other !is User)
+        if (other == null || other !is User || !this::city.isInitialized)
             return false
         return name == other.name &&
                 city == other.city &&
