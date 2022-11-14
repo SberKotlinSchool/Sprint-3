@@ -1,12 +1,13 @@
 package ru.sber.oop
 
-import java.util.Random
+import java.util.*
+
 
 interface Fightable {
     val powerType: String
     var healthPoints: Int
     val damageRoll: Int
-        get() = Random().nextInt()
+        get() = Random().nextInt(25)
 
     fun attack(opponent: Fightable): Int
 }
@@ -20,13 +21,13 @@ class Player(
         get() = "SuperPower"
 
     override fun attack(opponent: Fightable): Int {
+        val currentDamageRoll = this.damageRoll
         if (this.isBlessed) {
-            opponent.healthPoints -= this.damageRoll * 2
-            return this.damageRoll * 2
-        }
-        else {
-            opponent.healthPoints -= this.damageRoll
-            return this.damageRoll
+            opponent.healthPoints -= currentDamageRoll * 2
+            return currentDamageRoll * 2
+        } else {
+            opponent.healthPoints -=  currentDamageRoll
+            return currentDamageRoll
         }
     }
 }
@@ -37,8 +38,9 @@ abstract class Monster(
 ) : Fightable {
 
     override fun attack(opponent: Fightable): Int {
-        opponent.healthPoints -= this.damageRoll * 2
-        return this.damageRoll * 2
+        val currentDamageRoll = this.damageRoll
+        opponent.healthPoints -= currentDamageRoll * 2
+        return currentDamageRoll * 2
     }
 }
 
@@ -49,12 +51,24 @@ class Goblin(
     description: String = "An ugly  and angry creature",
 ) : Monster(name, description) {
     override val damageRoll: Int
-        get() = (Random().nextInt()) / 2
+        get() = (Random().nextInt(50)) / 2
     override val powerType: String
         get() = "ugliness"
     override var healthPoints: Int
         get() = 45
         set(value) {}
+}
+
+fun main() {
+    val player1 = Player("first", 100, true)
+    val player2 = Player("second", 100, false)
+
+    val attack = player2.attack(player1);
+
+
+    println("first's health point ${player1.healthPoints}")
+    println("seconds's health point ${player2.healthPoints}")
+    println("attack  $attack")
 }
 
 
