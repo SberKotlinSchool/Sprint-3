@@ -2,6 +2,7 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockkObject
+import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -32,14 +33,7 @@ internal class CertificateRequestTest {
         assertEquals(certificateRequest, result.certificateRequest)
         assertEquals(hrEmployeeNumber, result.processedBy)
         assertEquals(resultByteArray.size, result.data.size)
-    }
 
-    @Test
-    fun getEmployeeNumberTest() {
-        assertEquals(employeeNumber, certificateRequest.employeeNumber)
-    }
-    @Test
-    fun getCertificateTypeTest() {
-        assertEquals(certificateType, certificateRequest.certificateType)
+        verify { Scanner.getScanData() }
     }
 }

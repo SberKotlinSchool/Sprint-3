@@ -4,43 +4,23 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockkStatic
-import io.mockk.spyk
 import io.mockk.verify
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import java.time.Clock
 import java.time.DayOfWeek
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.util.LinkedList
+import kotlin.test.assertEquals
 
 internal class HrDepartmentTest {
     @MockK
     private lateinit var certificateRequest: CertificateRequest
 
-    private val clock = Clock.fixed(
-        Instant.parse("2022-11-01T23:00:00.00Z"), ZoneId.of("Europe/Moscow"))
-
     @BeforeEach
     fun init() {
         MockKAnnotations.init(this)
-        spyk<HrDepartment>()
-    }
-
-    @Test
-    fun getClock() {
-        mockkStatic(Clock::class)
-        every { Clock.systemUTC() } returns clock
-        assertEquals(clock, HrDepartment.clock)
-    }
-
-    @Test
-    fun setClock() {
-        HrDepartment.clock = clock
-        assertEquals(clock, HrDepartment.clock)
     }
 
     @Test
@@ -94,15 +74,31 @@ internal class HrDepartmentTest {
 
     @Test
     fun processNextRequest() {
-        mockkStatic(LocalDateTime::class)
-        every { LocalDateTime.now(HrDepartment.clock).dayOfWeek } returns DayOfWeek.THURSDAY
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
-        HrDepartment.receiveRequest(certificateRequest)
+        val incomeBox:  LinkedList<CertificateRequest> = LinkedList()
+        val outcomeOutcome: LinkedList<Certificate> = LinkedList()
 
-        every { certificateRequest.process(any()) } returns Certificate(certificateRequest, 123L, ByteArray(1))
+        val incomeBoxTest: LinkedList<CertificateRequest>
+        HrDepartment::class.java.getDeclaredField("incomeBox").let {
+            it.isAccessible = true
+            incomeBoxTest = it.get(incomeBox) as LinkedList<CertificateRequest>
+        }
+
+        val outcomeOutcomeTest: LinkedList<Certificate>
+        HrDepartment::class.java.getDeclaredField("outcomeOutcome").let {
+            it.isAccessible = true
+            outcomeOutcomeTest = it.get(outcomeOutcome) as LinkedList<Certificate>
+        }
+
+        incomeBoxTest.push(certificateRequest)
+
+        val certificate = Certificate(certificateRequest, 123L, ByteArray(1))
+        every { certificateRequest.process(any()) } returns certificate
+
         HrDepartment.processNextRequest(123L)
+
         verify {
             certificateRequest.process(123L)
         }
+        assertEquals(outcomeOutcomeTest.first, certificate)
     }
 }

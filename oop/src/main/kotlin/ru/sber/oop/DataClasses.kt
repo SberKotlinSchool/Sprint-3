@@ -7,7 +7,7 @@ data class User(val name: String, val age: Long) {
         (other is User) &&
             this.age == other.age &&
             this.name.equals(other.name) &&
-            this.city.equals(other.city)
+            (if (!this.city.isBlank()) this.city.equals(other.city) else false)
 }
 
 fun main() {
