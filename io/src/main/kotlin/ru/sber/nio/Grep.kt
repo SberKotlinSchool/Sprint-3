@@ -23,26 +23,27 @@ open class Grep {
      */
     open fun find(subString: String) {
         val sourcePath = Paths.get("/Users/annapopova/ideaProjects/Sprint-3/io/logs")
-        var substringList: List<String>;
-        Files.walkFileTree(sourcePath, object : SimpleFileVisitor<Path>() {
-            @Throws(IOException::class)
-            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                file.useLines { it ->
-                    var currResultList: MutableList<String> = mutableListOf<String>()
-                    var lineNumber = 1
-                    it.forEach {
-                        if (it.contains(subString)) {
-                            currResultList.add(file.fileName.toString())
-                            currResultList.add(lineNumber.toString())
-                            currResultList.add(it.toString())
-                            val joinToString = currResultList.joinToString("  : ")
-                            println("Что получилось в очередной строке $joinToString")
-                        } else
-                            lineNumber++
+
+        File("/Users/annapopova/ideaProjects/Sprint-3/io/result.txt").bufferedWriter().use { writer ->
+            Files.walkFileTree(sourcePath, object : SimpleFileVisitor<Path>() {
+                @Throws(IOException::class)
+                override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                    file.useLines { it ->
+                        var lineNumber = 1
+                        it.forEach {
+                            if (it.contains(subString)) {
+                                var currResultList: MutableList<String> = mutableListOf<String>()
+                                currResultList.add(file.fileName.toString())
+                                currResultList.add(lineNumber.toString())
+                                currResultList.add(it)
+                                val result = currResultList.joinToString("  : ")
+                                writer.appendLine(result)
+                            } else lineNumber++
+                        }
                     }
+                    return FileVisitResult.CONTINUE
                 }
-                return FileVisitResult.CONTINUE
-            }
-        })
+            })
+        }
     }
 }
