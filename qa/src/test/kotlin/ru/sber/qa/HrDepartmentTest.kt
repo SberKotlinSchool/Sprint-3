@@ -13,22 +13,50 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import kotlin.test.assertFailsWith
+import java.util.*
+import kotlin.random.Random
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
+import kotlin.test.*
 
 internal class HrDepartmentTest {
+    companion object {
+        @JvmStatic
+        fun getMonWedFri() = listOf(
+            Arguments.of("2022-10-31T00:15:30.00Z"),
+            Arguments.of("2022-11-02T00:15:30.00Z"),
+            Arguments.of("2022-11-04T00:15:30.00Z")
+        )
+
+        @JvmStatic
+        fun getTueThu() = listOf(
+            Arguments.of("2022-11-01T00:15:30.00Z"),
+            Arguments.of("2022-11-03T00:15:30.00Z")
+        )
+
+        @JvmStatic
+        fun getWeekend() = listOf(
+            Arguments.of("2022-11-05T00:15:30.00Z"),
+            Arguments.of("2022-11-06T00:15:30.00Z")
+        )
+    }
 
     val certRequestNdfl = mockk<CertificateRequest>()
     val certRequestLabourBook = mockk<CertificateRequest>()
 
+    val random = Random.nextBytes(1)
+
     @BeforeEach
     fun setUp() {
-        mockkObject(HrDepartment)
-
         every { certRequestNdfl.employeeNumber } returns 1
         every { certRequestNdfl.certificateType } returns CertificateType.NDFL
+        every { certRequestLabourBook.process(1) } returns Certificate(certRequestNdfl, 1, random )
+
 
         every { certRequestLabourBook.employeeNumber } returns 2
         every { certRequestLabourBook.certificateType } returns CertificateType.LABOUR_BOOK
+        every { certRequestLabourBook.process(1) } returns Certificate(certRequestLabourBook, 1, random )
     }
 
     @ParameterizedTest
@@ -79,29 +107,29 @@ internal class HrDepartmentTest {
     fun labourBookRequestShouldNotGetException(dayOfWeek: String) {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
+
         verify(exactly = 1) {
             HrDepartment.receiveRequest(certRequestLabourBook)
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun getMonWedFri() = listOf(
-            Arguments.of("2022-10-31T00:15:30.00Z"),
-            Arguments.of("2022-11-02T00:15:30.00Z"),
-            Arguments.of("2022-11-04T00:15:30.00Z")
-        )
+    @Test
+    fun checkProcessNextRequestWorks() {
+        HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
+        val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
+        assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
 
-        @JvmStatic
-        fun getTueThu() = listOf(
-            Arguments.of("2022-11-01T00:15:30.00Z"),
-            Arguments.of("2022-11-03T00:15:30.00Z")
-        )
+        HrDepartment.processNextRequest(hrEmployeeNumber = 1)
+        val outcomeBox = getPrivateField<LinkedList<String>>("outcomeBox")
 
-        @JvmStatic
-        fun getWeekend() = listOf(
-            Arguments.of("2022-11-05T00:15:30.00Z"),
-            Arguments.of("2022-11-06T00:15:30.00Z")
-        )
+        assertNotNull(outcomeBox, "Количество элементов outcomeBox  не должно быть  null, а по факту равно ${outcomeBox.size}")
+        assertTrue(outcomeBox.size==1, "Количество элементов в outcomeBox не соответствует ожидаемому")
+        assertTrue(incomeBox.size==0, "Количество элементов incomeBox   должно быть  0, а по факту равно ${incomeBox.size}")
     }
+
+    fun <T> getPrivateField(name: String): T =
+        HrDepartment::class.java
+            .getDeclaredField(name)
+            .apply { isAccessible = true }
+            .get(this) as T
 }
