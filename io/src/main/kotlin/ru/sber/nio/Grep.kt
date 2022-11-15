@@ -23,8 +23,10 @@ open class Grep {
      */
     open fun find(subString: String) {
         val sourcePath = Paths.get("/Users/annapopova/ideaProjects/Sprint-3/io/logs")
+        val destFile = File("result.txt")
+       destFile.createNewFile();
 
-        File("/Users/annapopova/ideaProjects/Sprint-3/io/result.txt").bufferedWriter().use { writer ->
+        File("result.txt").bufferedWriter().use { writer ->
             Files.walkFileTree(sourcePath, object : SimpleFileVisitor<Path>() {
                 @Throws(IOException::class)
                 override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
