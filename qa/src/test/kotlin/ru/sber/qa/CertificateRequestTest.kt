@@ -1,37 +1,43 @@
 package ru.sber.qa
 
 import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkClass
 import io.mockk.mockkObject
-import org.junit.Before
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 import kotlin.random.Random
 
 
 internal class CertificateRequestTest {
-    val req = mockkClass(CertificateRequest::class)
-
     val hrEmployeeNumber: Long = 111
-    val cert = Certificate(req, hrEmployeeNumber, Random.nextBytes(1))
+
+    companion object {
+        @JvmStatic
+        fun getCertRequest() = Stream.of(
+            Arguments.of(
+                CertificateRequest(employeeNumber = 111, CertificateType.NDFL),
+                Arguments.of(
+                    CertificateRequest(employeeNumber = 222, CertificateType.LABOUR_BOOK)
+                )
+            )
+        )
+    }
 
     @BeforeEach
     fun setUp() {
         mockkObject(Scanner)
         every { Scanner.getScanData() } returns Random.nextBytes(1)
-
-        every { req.employeeNumber } returns 1
-        every { req.certificateType } returns CertificateType.NDFL
-        every { req.process(hrEmployeeNumber) } returns cert
     }
 
-    @Test
-    fun process() {
-        val process = req.process(hrEmployeeNumber)
-        assertEquals(hrEmployeeNumber, process.processedBy)
-        assertEquals(cert.certificateRequest, process.certificateRequest)
+    @ParameterizedTest
+    @MethodSource("getCertRequest")
+    fun processReturnsCertificateTest(certRequest: CertificateRequest) {
+        val certificate = certRequest.process(hrEmployeeNumber)
+        assertEquals(hrEmployeeNumber, certificate.processedBy)
+        assertEquals(certRequest, certificate.certificateRequest)
     }
 }

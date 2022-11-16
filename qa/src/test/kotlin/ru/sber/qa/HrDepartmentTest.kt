@@ -51,8 +51,6 @@ internal class HrDepartmentTest {
     fun setUp() {
         every { certRequestNdfl.employeeNumber } returns 1
         every { certRequestNdfl.certificateType } returns CertificateType.NDFL
-        every { certRequestLabourBook.process(1) } returns Certificate(certRequestNdfl, 1, random )
-
 
         every { certRequestLabourBook.employeeNumber } returns 2
         every { certRequestLabourBook.certificateType } returns CertificateType.LABOUR_BOOK
@@ -100,6 +98,8 @@ internal class HrDepartmentTest {
     fun ndflRequestShouldNotGetException(dayOfWeek: String) {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
+        val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
+        assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
     }
 
     @ParameterizedTest
@@ -107,14 +107,14 @@ internal class HrDepartmentTest {
     fun labourBookRequestShouldNotGetException(dayOfWeek: String) {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
-
-        verify(exactly = 1) {
-            HrDepartment.receiveRequest(certRequestLabourBook)
-        }
+        val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
+        assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
     }
 
     @Test
     fun checkProcessNextRequestWorks() {
+       HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-01T00:15:30.00Z"), ZoneId.of("Europe/Moscow"));
+
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
         val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
         assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
