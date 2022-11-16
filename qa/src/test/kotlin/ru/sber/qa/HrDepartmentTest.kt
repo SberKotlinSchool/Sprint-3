@@ -2,8 +2,6 @@ package ru.sber.qa
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -15,9 +13,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.util.*
 import kotlin.random.Random
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 import kotlin.test.*
 
 internal class HrDepartmentTest {
@@ -54,7 +49,7 @@ internal class HrDepartmentTest {
 
         every { certRequestLabourBook.employeeNumber } returns 2
         every { certRequestLabourBook.certificateType } returns CertificateType.LABOUR_BOOK
-        every { certRequestLabourBook.process(1) } returns Certificate(certRequestLabourBook, 1, random )
+        every { certRequestLabourBook.process(1) } returns Certificate(certRequestLabourBook, 1, random)
     }
 
     @ParameterizedTest
@@ -99,7 +94,10 @@ internal class HrDepartmentTest {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestNdfl)
         val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
-        assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
+        assertNotNull(
+            incomeBox,
+            "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}"
+        )
     }
 
     @ParameterizedTest
@@ -108,23 +106,35 @@ internal class HrDepartmentTest {
         HrDepartment.clock = Clock.fixed(Instant.parse(dayOfWeek), ZoneId.of("Asia/Calcutta"));
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
         val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
-        assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
+        assertNotNull(
+            incomeBox,
+            "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}"
+        )
     }
 
     @Test
     fun checkProcessNextRequestWorks() {
-       HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-01T00:15:30.00Z"), ZoneId.of("Europe/Moscow"));
+        HrDepartment.clock = Clock.fixed(Instant.parse("2022-11-01T00:15:30.00Z"), ZoneId.of("Europe/Moscow"));
 
         HrDepartment.receiveRequest(certificateRequest = certRequestLabourBook)
         val incomeBox: LinkedList<String> = getPrivateField("incomeBox")
-        assertNotNull(incomeBox, "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}")
+        assertNotNull(
+            incomeBox,
+            "Количество элементов в incomeBox не должно быть  null, а по факту равно ${incomeBox.size}"
+        )
 
         HrDepartment.processNextRequest(hrEmployeeNumber = 1)
         val outcomeBox = getPrivateField<LinkedList<String>>("outcomeBox")
 
-        assertNotNull(outcomeBox, "Количество элементов outcomeBox  не должно быть  null, а по факту равно ${outcomeBox.size}")
-        assertTrue(outcomeBox.size==1, "Количество элементов в outcomeBox не соответствует ожидаемому")
-        assertTrue(incomeBox.size==0, "Количество элементов incomeBox   должно быть  0, а по факту равно ${incomeBox.size}")
+        assertNotNull(
+            outcomeBox,
+            "Количество элементов outcomeBox  не должно быть  null, а по факту равно ${outcomeBox.size}"
+        )
+        assertTrue(outcomeBox.size == 1, "Количество элементов в outcomeBox не соответствует ожидаемому")
+        assertTrue(
+            incomeBox.size == 0,
+            "Количество элементов incomeBox   должно быть  0, а по факту равно ${incomeBox.size}"
+        )
     }
 
     fun <T> getPrivateField(name: String): T =

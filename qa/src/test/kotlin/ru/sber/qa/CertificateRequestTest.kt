@@ -30,7 +30,7 @@ internal class CertificateRequestTest {
     @BeforeEach
     fun setUp() {
         mockkObject(Scanner)
-        every { Scanner.getScanData() } returns Random.nextBytes(1)
+        every { Scanner.getScanData(Constants.SCAN_TIMEOUT_THRESHOLD) } returns Random.nextBytes(1)
     }
 
     @ParameterizedTest

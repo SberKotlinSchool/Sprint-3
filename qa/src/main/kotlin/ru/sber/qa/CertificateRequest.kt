@@ -9,5 +9,5 @@ class CertificateRequest(
 ) {
 
     fun process(hrEmployeeNumber: Long): Certificate =
-        Certificate(certificateRequest = this, processedBy = hrEmployeeNumber, data = Scanner.getScanData())
+        Certificate(certificateRequest = this, processedBy = hrEmployeeNumber, data = Scanner.getScanData(Constants.SCAN_TIMEOUT_THRESHOLD))
 }

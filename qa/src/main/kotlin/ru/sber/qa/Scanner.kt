@@ -3,9 +3,7 @@ package ru.sber.qa
 import kotlin.random.Random
 
 object Scanner {
-    const val SCAN_TIMEOUT_THRESHOLD = 10_000L
-
-    fun getScanData(): ByteArray {
+    fun getScanData(SCAN_TIMEOUT_THRESHOLD: Long): ByteArray {
         val scanDuration = Random.nextLong(5000L, 15000L)
         if (scanDuration > SCAN_TIMEOUT_THRESHOLD) {
             Thread.sleep(SCAN_TIMEOUT_THRESHOLD)
