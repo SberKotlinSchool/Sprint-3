@@ -3,13 +3,15 @@ package ru.sber.qa
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.util.LinkedList
+import java.util.*
 
 /**
  * Отдел кадров.
  */
-object HrDepartment {
-    var clock = Clock.systemUTC()
+class HrDepartment(
+    private val scanner: Scanner = Scanner(),
+    private val clock: Clock = Clock.systemUTC(),
+) {
     private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
     private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
 
@@ -35,7 +37,7 @@ object HrDepartment {
      */
     fun processNextRequest(hrEmployeeNumber: Long) {
         val certificateRequest = incomeBox.poll()
-        val certificate = certificateRequest.process(hrEmployeeNumber)
+        val certificate = certificateRequest.process(hrEmployeeNumber, scanner)
         outcomeOutcome.push(certificate)
     }
 }

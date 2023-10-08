@@ -8,6 +8,6 @@ class CertificateRequest(
     val certificateType: CertificateType,
 ) {
 
-    fun process(hrEmployeeNumber: Long): Certificate =
-        Certificate(certificateRequest = this, processedBy = hrEmployeeNumber, data = Scanner.getScanData())
+    fun process(hrEmployeeNumber: Long, scanner: Scanner): Certificate =
+        Certificate(certificateRequest = this, processedBy = hrEmployeeNumber, data = scanner.getScanData())
 }
