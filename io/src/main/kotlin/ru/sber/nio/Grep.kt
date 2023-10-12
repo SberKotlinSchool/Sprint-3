@@ -1,5 +1,12 @@
 package ru.sber.nio
 
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlin.io.path.*
+
+fun main(){
+    Grep().find("192.168.1.1")
+}
 /**
  * Реализовать простой аналог утилиты grep с использованием калссов из пакета java.nio.
  */
@@ -16,5 +23,17 @@ class Grep {
      */
     fun find(subString: String) {
 
-    }
+        val resultFile = Paths.get("io/result.txt").bufferedWriter()
+
+        Files.walk(Paths.get("io/logs")).filter{it.isRegularFile()}.forEach {
+            path ->
+            path.readLines().forEachIndexed() {
+                i, s ->
+                if (s.contains(subString)) {
+                    resultFile.write("${path.name} : ${i + 1} : $s\n" )
+                }
+            }
+        }
+        resultFile.flush()
+   }
 }
