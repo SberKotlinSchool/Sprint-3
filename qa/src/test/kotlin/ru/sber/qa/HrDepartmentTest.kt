@@ -1,8 +1,6 @@
 package ru.sber.qa
 
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.time.Clock
@@ -47,11 +45,28 @@ internal class HrDepartmentTest {
         val expectedCertificate = Certificate(certificateRequest, 1123, byteArrayOf())
         every { certificateRequest.process(any()) } returns expectedCertificate
 
+        mockkObject(HrDepartmentExchange)
+
         HrDepartment.receiveRequest(certificateRequest)
         //Нет ошибок - успех
+        verify(exactly = 1) { HrDepartmentExchange.pushIncome(certificateRequest) }
+
+        unmockkAll()
+    }
+
+    @Test
+    fun `processNextRequest() вызов без ошибок`() {
+        val certificateRequest = mockk<CertificateRequest>()
+        val expectedCertificate = Certificate(certificateRequest, 1123, byteArrayOf())
+        every { certificateRequest.process(any()) } returns expectedCertificate
+
+        mockkObject(HrDepartmentExchange)
+        every { HrDepartmentExchange.pollIncomeBox() } returns certificateRequest
 
         HrDepartment.processNextRequest(1123)
-        verify(exactly = 1) { certificateRequest.process(1123) }
+
+        verify(exactly = 1) { HrDepartmentExchange.pushOutcome(expectedCertificate) }
+        unmockkAll()
     }
 
 
