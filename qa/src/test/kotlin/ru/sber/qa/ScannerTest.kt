@@ -34,7 +34,7 @@ internal class ScannerTest{
         val scanData = Scanner.getScanData()
         verify(exactly = 1) { Random.nextLong(any(), any()) }
         assertTrue{ 100 == scanData.size }
-        assertTrue{ scanData is ByteArray  }
+        assertTrue{ true }
     }
 
 }

@@ -70,6 +70,7 @@ class HrDepartmentTest {
                                 }
                         }
                     }
+                    else -> {}
                 }
             }
         }
@@ -85,7 +86,7 @@ class HrDepartmentTest {
         HrDepartment.processNextRequest(HR_EMPLOYEE_NUMBER)
         field = HrDepartment::class.java.getDeclaredField("outcomeOutcome")
         field.isAccessible = true
-        val outcomeOutcome = field.get(HrDepartment) as LinkedList<Certificate>
+        val outcomeOutcome = field.get(HrDepartment) as LinkedList<*>
         assertEquals(outcomeOutcome[0], certificate)
         assertEquals(outcomeOutcome.size, 1)
         outcomeOutcome.clear()
