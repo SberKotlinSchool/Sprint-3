@@ -23,24 +23,24 @@ class Player() : Fightable {
         } else {
             damageRoll
         }
-        opponent.healthPoints = opponent.healthPoints - damage
+        opponent.healthPoints -= damage
         return damage
     }
 }
 
-open class Monster: Fightable {
+open class Monster : Fightable {
     override var healthPoints: Int = 12
     override val powerType: String = "Power"
     val name: String = "Tom"
     val description: String = "Terrible $name"
 
     override fun attack(opponent: Fightable): Int {
-        opponent.healthPoints = opponent.healthPoints - damageRoll
+        opponent.healthPoints -= damageRoll
         return damageRoll
     }
 }
 
-class Goblin: Monster() {
+class Goblin : Monster() {
     override val damageRoll: Int
-        get() = super.damageRoll/2
+        get() = super.damageRoll / 2
 }
