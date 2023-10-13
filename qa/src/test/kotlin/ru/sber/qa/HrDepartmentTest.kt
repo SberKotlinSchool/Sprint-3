@@ -77,8 +77,9 @@ class HrDepartmentTest {
 
         val dateTime = LocalDateTime.of(2023, Month.OCTOBER, 9, 10, 0, 0)
         HrDepartment.clock =  Clock.fixed(dateTime.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
+        val incomeBox = getPrivateFieldsHrDepartment("incomeBox") as LinkedList<CertificateRequest>
+        incomeBox.push(certificateRequest)
 
-        HrDepartment.receiveRequest(certificateRequest)
         HrDepartment.processNextRequest(Random.nextLong())
 
         val outcomeOutcome = getPrivateFieldsHrDepartment("outcomeOutcome")
