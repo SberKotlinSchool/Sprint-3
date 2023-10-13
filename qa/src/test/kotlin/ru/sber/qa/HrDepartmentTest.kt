@@ -62,7 +62,7 @@ class HrDepartmentTest {
     @Test
     fun processNextRequestSuccessfully() {
         mockkConstructor(LinkedList::class) {
-            every { anyConstructed<LinkedList<Any>>().poll() } returns mockk<CertificateRequest>()
+            every { anyConstructed<LinkedList<Any>>().poll() } returns mockk<CertificateRequest>(relaxed = true)
             mockkObject(Scanner)
             every { Scanner.getScanData() } returns ByteArray(100)
             assertDoesNotThrow { HrDepartment.processNextRequest(HR_EMPLOYEE_NUMBER) }
