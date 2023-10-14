@@ -10,8 +10,13 @@ import org.junit.jupiter.api.assertThrows
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
+@Suppress("UNCHECKED_CAST")
 class HrDepartmentTest {
+
     private val mockClock = mockk<Clock>()
 
     @BeforeEach
@@ -31,16 +36,17 @@ class HrDepartmentTest {
         every { mockClock.zone } returns ZoneId.of("Europe/Moscow")
 
         HrDepartment.clock = mockClock
-
-        val certificateRequest =
-            CertificateRequest(employeeNumber = 1, certificateType = CertificateType.NDFL)
+        HrDepartment.receiveRequest(CertificateRequest(employeeNumber = 1, certificateType = CertificateType.NDFL))
 
         assertDoesNotThrow {
-            HrDepartment.receiveRequest(certificateRequest)
+            HrDepartment.receiveRequest(CertificateRequest(employeeNumber = 1, certificateType = CertificateType.NDFL))
         }
 
-
-        HrDepartment.processNextRequest(1)
+        val incomeBox: LinkedList<CertificateRequest> =
+            HrDepartment.getPrivateField("incomeBox") as LinkedList<CertificateRequest>
+        val certificateRequest = incomeBox.poll()
+        assertEquals(1, certificateRequest.employeeNumber)
+        assertEquals(CertificateType.NDFL, certificateRequest.certificateType)
     }
 
     @Test
@@ -50,15 +56,20 @@ class HrDepartmentTest {
 
         HrDepartment.clock = mockClock
 
-        val certificateRequest =
-            CertificateRequest(employeeNumber = 1, certificateType = CertificateType.LABOUR_BOOK)
-
         assertDoesNotThrow {
-            HrDepartment.receiveRequest(certificateRequest)
+            HrDepartment.receiveRequest(
+                CertificateRequest(
+                    employeeNumber = 2,
+                    certificateType = CertificateType.LABOUR_BOOK
+                )
+            )
         }
 
-        HrDepartment.processNextRequest(1)
-
+        val incomeBox: LinkedList<CertificateRequest> =
+            HrDepartment.getPrivateField("incomeBox") as LinkedList<CertificateRequest>
+        val certificateRequest = incomeBox.poll()
+        assertEquals(2, certificateRequest.employeeNumber)
+        assertEquals(CertificateType.LABOUR_BOOK, certificateRequest.certificateType)
     }
 
     @Test
@@ -88,6 +99,49 @@ class HrDepartmentTest {
 
         assertThrows<NotAllowReceiveRequestException> {
             HrDepartment.receiveRequest(certificateRequest)
+        }
+    }
+
+    @Test
+    fun processNextRequest() {
+        every { mockClock.instant() } returns Instant.parse("2023-10-04T12:00:00Z")
+        every { mockClock.zone } returns ZoneId.of("Europe/Moscow")
+
+        HrDepartment.clock = mockClock
+
+        val certificateRequest =
+            CertificateRequest(employeeNumber = 1, certificateType = CertificateType.LABOUR_BOOK)
+
+        val incomeBox: LinkedList<CertificateRequest> =
+            HrDepartment.getPrivateField(fieldName = "incomeBox") as LinkedList<CertificateRequest>
+        incomeBox.push(certificateRequest)
+
+        assertEquals(1, incomeBox.size)
+
+        HrDepartment.processNextRequest(hrEmployeeNumber = 1)
+
+        assertEquals(0, incomeBox.size)
+
+        val outcomeOutcome: LinkedList<Certificate> =
+            HrDepartment.getPrivateField(fieldName = "outcomeOutcome") as LinkedList<Certificate>
+
+        assertEquals(1, outcomeOutcome.size)
+
+        val certificate = outcomeOutcome.poll()
+
+        assertTrue {
+            Certificate(
+                certificateRequest = certificateRequest,
+                processedBy = 1,
+                data = byteArrayOf(1)
+            ) == certificate
+        }
+    }
+
+    private fun HrDepartment.getPrivateField(fieldName: String): Any {
+        return javaClass.getDeclaredField(fieldName).let {
+            it.isAccessible = true
+            return@let it.get(this);
         }
     }
 }
