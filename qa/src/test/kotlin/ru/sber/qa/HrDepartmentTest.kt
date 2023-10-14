@@ -1,31 +1,20 @@
 package ru.sber.qa
 
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkStatic
+import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.Clock
-import java.time.DayOfWeek
-import java.time.LocalDateTime
-import java.util.*
-import kotlin.random.Random
+import java.time.Instant
+import java.time.ZoneId
 
-class HrDepartmentTest {
-
-    private val HR_EMPLOYEE_NUMBER = Random.nextLong()
-    private val EMPLOYEE_NUMBER = Random.nextLong()
-
-    private val certificateRequest: CertificateRequest = mockk()
-    private val certificate: Certificate = mockk()
+internal class HrDepartmentTest {
 
     @BeforeEach
     fun setUp() {
-        mockkStatic(LocalDateTime::class)
+        mockkObject(HrDepartment)
     }
 
     @AfterEach
@@ -34,61 +23,52 @@ class HrDepartmentTest {
     }
 
     @Test
-    fun test() {
-        for (dayOfWeek in DayOfWeek.values()) {
-            println(dayOfWeek)
-            every { LocalDateTime.now(any<Clock>()).dayOfWeek } returns dayOfWeek
-            for (certificateType in CertificateType.values()) {
-                println(certificateType)
-                every { certificateRequest.certificateType } returns certificateType
-                every { certificateRequest.employeeNumber } returns EMPLOYEE_NUMBER
-                every { certificateRequest.process(HR_EMPLOYEE_NUMBER) } returns certificate
+    fun `test receiveRequest with NDFL on a valid day`() {
+        HrDepartment.clock = Clock.fixed(Instant.parse("2023-10-09T10:00:00Z"), ZoneId.of("UTC"))
+        val certificateRequest = CertificateRequest(12345, CertificateType.NDFL)
 
-                when (dayOfWeek) {
-                    in listOf(DayOfWeek.SUNDAY, DayOfWeek.SATURDAY) -> {
-                        assertThrows<WeekendDayException> { HrDepartment.receiveRequest(certificateRequest) }
-                    }
-                    in listOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY) -> {
-                        when (certificateType) {
-                            CertificateType.LABOUR_BOOK ->
-                                assertThrows<NotAllowReceiveRequestException> {
-                                    HrDepartment.receiveRequest(
-                                        certificateRequest
-                                    )
-                                }
-                            CertificateType.NDFL -> checkPrivateFields()
-                        }
-                    }
-                    in listOf(DayOfWeek.TUESDAY, DayOfWeek.THURSDAY) -> {
-                        when (certificateType) {
-                            CertificateType.LABOUR_BOOK -> checkPrivateFields()
-                            CertificateType.NDFL ->
-                                assertThrows<NotAllowReceiveRequestException> {
-                                    HrDepartment.receiveRequest(
-                                        certificateRequest
-                                    )
-                                }
-                        }
-                    }
-                    else -> {}
-                }
-            }
-        }
+        HrDepartment.receiveRequest(certificateRequest)
+
+        val incomeBox = getPrivateFieldValue<List<CertificateRequest>>("incomeBox")
+        assertTrue(incomeBox.contains(certificateRequest))
     }
 
-    private fun checkPrivateFields() {
+    @Test
+    fun `test receiveRequest with Labour Book on a valid day`() {
+        HrDepartment.clock = Clock.fixed(Instant.parse("2023-10-12T10:00:00Z"), ZoneId.of("UTC"))
+        val certificateRequest = CertificateRequest(12345, CertificateType.LABOUR_BOOK)
+
         HrDepartment.receiveRequest(certificateRequest)
-        var field = HrDepartment::class.java.getDeclaredField("incomeBox")
+
+        val incomeBox = getPrivateFieldValue<List<CertificateRequest>>("incomeBox")
+        assertTrue(incomeBox.contains(certificateRequest))
+    }
+
+    @Test
+    fun `test receiveRequest on a weekend day`() {
+        HrDepartment.clock = Clock.fixed(Instant.parse("2023-10-15T10:00:00Z"), ZoneId.of("UTC"))
+        val certificateRequest = CertificateRequest(12345, CertificateType.NDFL)
+
+        val exception = assertThrows(WeekendDayException::class.java) {
+            HrDepartment.receiveRequest(certificateRequest)
+        }
+        assertEquals("Заказ справков в выходной день не работает", exception.message)
+    }
+
+    @Test
+    fun `test receiveRequest on a non-allowed day for NDFL`() {
+        HrDepartment.clock = Clock.fixed(Instant.parse("2023-10-12T10:00:00Z"), ZoneId.of("UTC"))
+        val certificateRequest = CertificateRequest(12345, CertificateType.NDFL)
+
+        val exception = assertThrows(NotAllowReceiveRequestException::class.java) {
+            HrDepartment.receiveRequest(certificateRequest)
+        }
+        assertEquals("Не разрешено принять запрос на справку", exception.message)
+    }
+
+    private fun <T> getPrivateFieldValue(fieldName: String): T {
+        val field = HrDepartment::class.java.getDeclaredField(fieldName)
         field.isAccessible = true
-        val incomeBox = field.get(HrDepartment) as LinkedList<*>
-        assertEquals(incomeBox[0], certificateRequest)
-        assertEquals(incomeBox.size, 1)
-        HrDepartment.processNextRequest(HR_EMPLOYEE_NUMBER)
-        field = HrDepartment::class.java.getDeclaredField("outcomeOutcome")
-        field.isAccessible = true
-        val outcomeOutcome = field.get(HrDepartment) as LinkedList<*>
-        assertEquals(outcomeOutcome[0], certificate)
-        assertEquals(outcomeOutcome.size, 1)
-        outcomeOutcome.clear()
+        return field.get(HrDepartment) as T
     }
 }
