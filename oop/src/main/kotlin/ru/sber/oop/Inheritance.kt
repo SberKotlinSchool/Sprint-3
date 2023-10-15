@@ -8,7 +8,12 @@ open class Room(
 
     protected open val dangerLevel = 5
 
-    private val monster: Monster = Goblin("Goblin", "Description")
+    private val monster: Monster = Goblin(
+        name = "Goblin",
+        description = "Description",
+        powerType = "Magic",
+        healthPoints = 100
+    )
 
     fun description() = "Room: $name"
 
@@ -19,9 +24,9 @@ open class Room(
 //TODO: create class TownSquare here...
 class TownSquare : Room("Town Square", 1000) {
 
-    override val dangerLevel: Int = 3
+    override val dangerLevel: Int = super.dangerLevel - 3
 
-    override fun load(): String {
+    override final fun load(): String {
         return "Hello from TownSquare"
     }
 }
