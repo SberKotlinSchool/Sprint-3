@@ -1,12 +1,15 @@
 package ru.sber.qa
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.util.*
+import kotlin.test.assertEquals
 
 internal class HrDepartmentTest {
 
@@ -45,13 +48,14 @@ internal class HrDepartmentTest {
         val expectedCertificate = Certificate(certificateRequest, 1123, byteArrayOf())
         every { certificateRequest.process(any()) } returns expectedCertificate
 
-        mockkObject(HrDepartmentExchange)
+        val incomeBox = getPrivateFieldValue<LinkedList<CertificateRequest>>("incomeBox", HrDepartment.javaClass)
+        assertEquals(0, incomeBox.size)
 
+        //Вызов проверяемого метода
         HrDepartment.receiveRequest(certificateRequest)
-        //Нет ошибок - успех
-        verify(exactly = 1) { HrDepartmentExchange.pushIncome(certificateRequest) }
 
-        unmockkAll()
+        assertEquals(1, incomeBox.size)
+        assertEquals(certificateRequest, incomeBox[0])
     }
 
     @Test
@@ -60,13 +64,18 @@ internal class HrDepartmentTest {
         val expectedCertificate = Certificate(certificateRequest, 1123, byteArrayOf())
         every { certificateRequest.process(any()) } returns expectedCertificate
 
-        mockkObject(HrDepartmentExchange)
-        every { HrDepartmentExchange.pollIncomeBox() } returns certificateRequest
+        val incomeBox = getPrivateFieldValue<LinkedList<CertificateRequest>>("incomeBox", HrDepartment.javaClass)
+        val outcomeOutcome = getPrivateFieldValue<LinkedList<Certificate>>("outcomeOutcome", HrDepartment.javaClass)
+        assertEquals(0, outcomeOutcome.size)
+        incomeBox.push(certificateRequest)
+        assertEquals(1, incomeBox.size)
 
+        //Вызов проверяемого метод
         HrDepartment.processNextRequest(1123)
 
-        verify(exactly = 1) { HrDepartmentExchange.pushOutcome(expectedCertificate) }
-        unmockkAll()
+        assertEquals(1, outcomeOutcome.size)
+        assertEquals(expectedCertificate, outcomeOutcome[0])
+        assertEquals(0, incomeBox.size)
     }
 
 
@@ -84,4 +93,14 @@ internal class HrDepartmentTest {
     private fun sundayClock() = Clock.fixed(
             LocalDateTime.of(2006, 1, 1, 0, 0).toInstant(ZoneOffset.UTC),
             ZoneId.from(ZoneOffset.UTC))
+
+
+    /**
+     * Получение приватных переменных ¯\_(ツ)_/¯
+     */
+    private fun <T> getPrivateFieldValue(fieldName: String, className: Class<HrDepartment>): T {
+        val field = className.getDeclaredField(fieldName)
+        field.isAccessible = true
+        return field.get(className) as T
+    }
 }

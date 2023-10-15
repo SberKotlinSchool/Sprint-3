@@ -3,13 +3,15 @@ package ru.sber.qa
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
+import java.util.*
 
 /**
  * Отдел кадров.
  */
 object HrDepartment {
     var clock = Clock.systemUTC()
-    private val hrDepartmentExchange = HrDepartmentExchange
+    private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
+    private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
 
 
     /**
@@ -26,15 +28,15 @@ object HrDepartment {
         }
         if (!isAllowReceiveRequest)
             throw NotAllowReceiveRequestException()
-        hrDepartmentExchange.pushIncome(certificateRequest)
+        incomeBox.push(certificateRequest)
     }
 
     /**
      * Обработка запросов в порядке поступления.
      */
     fun processNextRequest(hrEmployeeNumber: Long) {
-        val certificateRequest = hrDepartmentExchange.pollIncomeBox()
+        val certificateRequest = incomeBox.poll()
         val certificate = certificateRequest.process(hrEmployeeNumber)
-        hrDepartmentExchange.pushOutcome(certificate)
+        outcomeOutcome.push(certificate)
     }
 }
