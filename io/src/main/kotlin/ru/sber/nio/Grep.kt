@@ -25,11 +25,12 @@ class Grep {
             .filter(Files::isRegularFile)
             .map(Path::toFile)
             .collect(Collectors.toList())
-        val outFile = File("io/result.txt").bufferedWriter()
-        files.forEach { file ->
-            file.readLines().forEachIndexed { index, element ->
-                if (element.contains(subString))
-                    outFile.write("${file.name} : $index : $element\n")
+        File("io/result.txt").bufferedWriter().use { out ->
+            files.forEach { file ->
+                file.readLines().forEachIndexed { index, element ->
+                    if (element.contains(subString))
+                        out.write("${file.name} : $index : $element\n")
+                }
             }
         }
     }

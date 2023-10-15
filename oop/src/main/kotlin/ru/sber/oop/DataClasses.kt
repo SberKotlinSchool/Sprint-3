@@ -11,6 +11,8 @@ data class User(val name: String, val age: Long) {
         if (city != other.city) return false
         return true
     }
+
+    override fun hashCode() = (name.hashCode() * 17).let { it + age.hashCode() }.let { it * 17 + city.hashCode() }
 }
 
 fun main() {

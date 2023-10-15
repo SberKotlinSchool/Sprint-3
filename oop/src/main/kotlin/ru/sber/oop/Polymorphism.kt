@@ -24,3 +24,21 @@ class Player(override val powerType: String, override var healthPoints: Int, val
     }
 }
 
+abstract class Monster : Fightable {
+    abstract val name: String
+    abstract val description: String
+
+    override fun attack(opponent: Fightable): Int {
+        opponent.healthPoints -= damageRoll
+        return damageRoll
+    }
+}
+
+class Goblin(
+    override val name: String,
+    override val description: String,
+    override val powerType: String,
+    override var healthPoints: Int,
+) : Monster() {
+    override val damageRoll = super.damageRoll / 2
+}
