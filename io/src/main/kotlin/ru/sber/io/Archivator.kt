@@ -1,7 +1,9 @@
 package ru.sber.io
 
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -20,14 +22,18 @@ class Archivator {
     fun zipLogfile() {
         val input = File("io/logfile.log")
         val output = File("io/logfile.zip")
-        ZipOutputStream(output.outputStream().buffered(bufferSize))
-            .use { outputStream ->
-                outputStream.putNextEntry(ZipEntry(input.name))
-                input.inputStream().buffered(bufferSize)
-                    .use { inputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-            }
+        try {
+            ZipOutputStream(output.outputStream().buffered(bufferSize))
+                .use { outputStream ->
+                    outputStream.putNextEntry(ZipEntry(input.name))
+                    input.inputStream().buffered(bufferSize)
+                        .use { inputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                }
+        } catch (e: IOException) {
+            println(e)
+        }
     }
 
     /**
@@ -36,29 +42,38 @@ class Archivator {
      */
     fun unzipLogfile() {
         val input = File("io/logfile.zip")
-        val output = File("unzippedLogfile.log")
-        output.outputStream().buffered(bufferSize)
-            .use { outputStream ->
-                ZipInputStream(input.inputStream().buffered(bufferSize))
-                    .use { inputStream ->
-                        inputStream.nextEntry
-                        inputStream.copyTo(outputStream)
-                    }
-            }
+        val output = File("io/unzippedLogfile.log")
+        try {
+            output.outputStream().buffered(bufferSize)
+                .use { outputStream ->
+                    ZipInputStream(input.inputStream().buffered(bufferSize))
+                        .use { inputStream ->
+                            inputStream.nextEntry
+                            inputStream.copyTo(outputStream)
+                        }
+                }
+        } catch (e: IOException) {
+            println(e)
+        }
     }
 }
 
 fun main() {
     val archivator = Archivator()
     val input = File("io/logfile.log")
-    val output = File("unzippedLogfile.log")
+    val output = File("io/unzippedLogfile.log")
     archivator.zipLogfile()
     archivator.unzipLogfile()
     print("После упаковки и распаковки содержимое файла не изменилось: " + input.isFileContentEquals(output))
 }
 
 private fun File.isFileContentEquals(anotherFile: File): Boolean {
-    val first = Files.readAllBytes(this.toPath())
-    val second = Files.readAllBytes(anotherFile.toPath())
-    return first.contentEquals(second)
+    return try {
+        val first = Files.readAllBytes(this.toPath())
+        val second = Files.readAllBytes(anotherFile.toPath())
+        first.contentEquals(second)
+    } catch (e: NoSuchFileException) {
+        println(e)
+        false
+    }
 }
