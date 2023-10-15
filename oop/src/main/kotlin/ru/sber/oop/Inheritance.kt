@@ -8,6 +8,8 @@ open class Room(val name: String, val size: Int) {
 
     fun description() = "Room: $name"
 
+    fun getDangerLevelTest() = dangerLevel
+
     //6) Добавьте функцию-расширение к классу Monster, getSalutation() - которое выдает приветствтие монстра
     //   и вызовите ее в функции load() класса ru.sber.oop.Room.
     open fun load() = monster.getSalutation()
@@ -17,7 +19,7 @@ open class Room(val name: String, val size: Int) {
     val monster: Monster = Goblin("особо уродливый")
 }
 
-class TownSquare : Room(name = "Town Square", size = 1000) {
+open class TownSquare : Room(name = "Town Square", size = 1000) {
 
     final override fun load(): String {
         return "some more load"
@@ -31,16 +33,3 @@ class TownSquare : Room(name = "Town Square", size = 1000) {
         return dangerLevel
     }
 }
-
-fun main() {
-    val r1 = Room("r1", 10)
-    val r2 = Room("r2")
-
-    println(r1.load())//Агрр!
-
-    val ts = TownSquare()
-    println("load: ${ts.load()}")
-    println("dangerLevel: ${ts.getDanderLevel()}")//2
-
-}
-

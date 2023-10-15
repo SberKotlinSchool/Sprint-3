@@ -72,51 +72,5 @@ fun Monster.getSalutation(): String {
     return "Агрр!"
 }
 
-/**
- * Проверка методов через проигрывание боя.
- */
-fun main() {
-
-    val p1 = Player("меч", 10, "Рыцарь", true)
-    val p2 = Player("огнестрел", 5, "Пехотинец", false)
-
-    var winner = fight(p1, p2)
-
-    val p3 = Monster("когти", 6, "Волк", "серый")
-    winner = fight(winner, p3)
-
-    val p4 = Goblin("страшный")
-    winner = fight(winner, p4)
-    /*
-    log:
-    Рыцарь(10) vs Пехотинец(5)
-    Рыцарь(10) наносит урон 14 Пехотинец(-9)
-    Победил Рыцарь
-    Рыцарь(10) vs Волк(серый)(6)
-    Рыцарь(10) наносит урон 0 Волк(серый)(6)
-    Волк(серый)(6) наносит урон 4 Рыцарь(6)
-    Рыцарь(6) наносит урон 18 Волк(серый)(-12)
-    Победил Рыцарь
-    Рыцарь(6) vs Гоблин(страшный)(4)
-    Рыцарь(6) наносит урон 10 Гоблин(страшный)(-6)
-    Победил Рыцарь
-     */
-}
-
-private fun fight(p1: Fightable, p2: Fightable): Fightable {
-    println("$p1(${p1.healthPoints}) vs ${p2}(${p2.healthPoints})")
-
-    while (p1.healthPoints > 0 && p2.healthPoints > 0) {
-        println("${p1}(${p1.healthPoints}) наносит урон ${p1.attack(p2)} ${p2}(${p2.healthPoints})")
-        if (p2.healthPoints > 0) {
-            println("${p2}(${p2.healthPoints}) наносит урон ${p2.attack(p1)} ${p1}(${p1.healthPoints})")
-        }
-    }
-
-    val winner = if (p1.healthPoints > 0) p1 else p2
-    println("Победил $winner")
-    return winner
-}
-
 
 
