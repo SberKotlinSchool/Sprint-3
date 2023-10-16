@@ -11,12 +11,14 @@ import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import java.util.*
 
 internal class HrDepartmentTest {
 
     @BeforeEach
     fun setUp() {
         mockkObject(HrDepartment)
+        mockkObject(Scanner)
     }
 
     @AfterEach
@@ -31,7 +33,7 @@ internal class HrDepartmentTest {
 
         HrDepartment.receiveRequest(certificateRequest)
 
-        val incomeBox = getPrivateFieldValue<List<CertificateRequest>>("incomeBox")
+        val incomeBox = getPrivateFieldIncomeBoxValue("incomeBox")
         assertTrue(incomeBox.contains(certificateRequest))
     }
 
@@ -42,7 +44,7 @@ internal class HrDepartmentTest {
 
         HrDepartment.receiveRequest(certificateRequest)
 
-        val incomeBox = getPrivateFieldValue<List<CertificateRequest>>("incomeBox")
+        val incomeBox = getPrivateFieldIncomeBoxValue("incomeBox")
         assertTrue(incomeBox.contains(certificateRequest))
     }
 
@@ -68,22 +70,46 @@ internal class HrDepartmentTest {
         assertEquals("Не разрешено принять запрос на справку", exception.message)
     }
 
-    private fun <T> getPrivateFieldValue(fieldName: String): T {
-        val field = HrDepartment::class.java.getDeclaredField(fieldName)
-        field.isAccessible = true
-        return field.get(HrDepartment) as T
+    @Test
+    fun `processNextRequest should process a certificate request`() {
+        // Создаем мок-объекты CertificateRequest и Certificate
+        val certificateRequest = mockk<CertificateRequest>()
+        val certificate = mockk<Certificate>()
+        // Заполняем incomeBox мок-запросом
+        getPrivateFieldIncomeBoxValue("incomeBox").add(certificateRequest)
+        // Устанавливаем поведение мок-объектов
+        every { certificateRequest.process(any()) } returns certificate
+        // Вызываем метод, который тестируем
+        HrDepartment.processNextRequest(123L)
+        // Проверяем, что outcomeOutcome содержит ожидаемый Certificate
+        assertEquals(certificate, getPrivateFieldOutcomeValue("outcomeOutcome").first())
     }
 
     @Test
-    fun `processNextRequest should handle request`() {
-        val certificateRequest = CertificateRequest(1, CertificateType.NDFL)
-        HrDepartment.clock = mockk()
-        val incomeBox = getPrivateFieldValue<List<CertificateRequest>>("incomeBox")
-        val outcomeOutcome = getPrivateFieldValue<List<CertificateRequest>>("outcomeOutcome")
-        every { certificateRequest.process(any()) } returns Certificate(certificateRequest, 1, byteArrayOf(1, 2, 3))
-        HrDepartment.processNextRequest(1)
-        assertEquals(0, incomeBox.size)
-        assertEquals(1, outcomeOutcome.size)
+    fun `test processNextRequest when incomeBox is not empty`() {
+        // Создаем мок-объекты
+        val certificateRequest = mockk<CertificateRequest>()
+        val certificate = mockk<Certificate>()
+        // Устанавливаем значение incomeBox
+        getPrivateFieldIncomeBoxValue("incomeBox").add(certificateRequest)
+        val outcome = getPrivateFieldOutcomeValue("outcomeOutcome")
+        // Мокируем вызовы методов
+        every { certificateRequest.process(any()) } returns certificate
+        // Вызываем метод processNextRequest
+        HrDepartment.processNextRequest(123L)
+        // Проверяем, что outcomeOutcome обновился
+        assertEquals(1, outcome.size)
     }
 
+    private fun getPrivateFieldIncomeBoxValue(fieldName: String): LinkedList<CertificateRequest>  {
+        val field = HrDepartment::class.java.getDeclaredField(fieldName)
+        field.isAccessible = true
+        return field.get(HrDepartment) as LinkedList<CertificateRequest>
+    }
+
+    private fun getPrivateFieldOutcomeValue(fieldName: String): LinkedList<Certificate>  {
+        val field = HrDepartment::class.java.getDeclaredField(fieldName)
+        field.isAccessible = true
+        return field.get(HrDepartment) as LinkedList<Certificate>
+    }
 }
