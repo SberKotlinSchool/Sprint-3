@@ -15,7 +15,6 @@ object HrDepartment {
 
     /**
      * Получение запроса на изготовление справки.
-     *
      */
     fun receiveRequest(certificateRequest: CertificateRequest) {
         val currentDayOfWeek = LocalDateTime.now(clock).dayOfWeek
