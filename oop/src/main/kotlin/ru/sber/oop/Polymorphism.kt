@@ -11,19 +11,25 @@ interface Fightable {
     fun attack(opponent: Fightable): Int
 }
 
-class Player(val name: String, override val powerType: String, override var healthPoints: Int) : Fightable {
-    private val isBlessed: Boolean = false
+class Player(
+    val name: String,
+    override val powerType: String,
+    override var healthPoints: Int,
+    var isBlessed: Boolean = false
+) : Fightable {
+
     override fun attack(opponent: Fightable): Int {
         var damage = damageRoll
         if (isBlessed) damage *= 2
-        return opponent.healthPoints - damage
-
+        opponent.healthPoints -= damage
+        return damage
     }
 }
 
 abstract class Monster : Fightable {
     override fun attack(opponent: Fightable): Int {
-        return opponent.healthPoints - damageRoll
+        opponent.healthPoints -= damageRoll
+        return damageRoll
     }
 }
 
@@ -39,7 +45,5 @@ class Goblin : Monster() {
     override val damageRoll: Int
         get() = super.damageRoll / 2
 }
-
-//TODO: create class Player, Monster, Goblin here...
 
 

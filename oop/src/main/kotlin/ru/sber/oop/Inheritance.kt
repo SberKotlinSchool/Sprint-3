@@ -14,13 +14,13 @@ open class Room(private val name: String, val size: Int) {
 
 }
 
-class TownSquare(name: String, size: Int = 1000) : Room(name, size) {
-    override val dangerLevel = 2
+open class TownSquare(name: String = "Town Square", size: Int = 1000) : Room(name, size) {
+    override val dangerLevel = super.dangerLevel - 3
     final override fun load(): String {
         return "Something new string"
     }
 }
 
-fun Monster.getSalutation():String{
+fun Monster.getSalutation(): String {
     return "Hi Monster!!"
 }

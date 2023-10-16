@@ -22,17 +22,17 @@ class Grep {
     fun find(subString: String) {
         val paths = Paths.get("io/logs")
         val destination = File("io/result.txt")
+        val allLines = ArrayList<String>()
         Files.walk(paths).filter { it.toString().endsWith(".log") }.forEach { path ->
             val logLines = Files.lines(path).filter { line -> line.contains(subString) }.toList()
-            if (logLines.size != 0) {
-                for (line in logLines) {
-                    destination.outputStream().use { out ->
-                        out.channel.use { channel ->
-                            val elements = line.toByteArray()
-                            val byteBuffer = ByteBuffer.wrap(elements)
-                            channel.write(byteBuffer)
-                        }
-                    }
+            allLines.addAll(logLines)
+        }
+        destination.outputStream().use { out ->
+            out.channel.use { channel ->
+                for (line in allLines) {
+                    val elements = (line + "\n").toByteArray()
+                    val byteBuffer = ByteBuffer.wrap(elements)
+                    channel.write(byteBuffer)
                 }
             }
         }
