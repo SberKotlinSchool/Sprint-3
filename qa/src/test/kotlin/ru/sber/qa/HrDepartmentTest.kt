@@ -62,7 +62,7 @@ class HrDepartmentTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideNotAllowReceiveRequestExceptionData")
+    @MethodSource("ru.sber.qa.HrDepartmentTest#provideNotAllowReceiveRequestExceptionData")
     fun testReceiveRequestSuccess(certificateType: CertificateType, dayOfWeek: DayOfWeek) {
         prepareDate(dayOfWeek)
         assertDoesNotThrow { HrDepartment.receiveRequest(CertificateRequest(1, certificateType)) }
