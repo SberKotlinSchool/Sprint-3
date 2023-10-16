@@ -32,7 +32,7 @@ class Player(
     }
 }
 
-open class Monster(
+abstract class Monster(
     val name: String,
     val description: String,
     override val powerType: String,

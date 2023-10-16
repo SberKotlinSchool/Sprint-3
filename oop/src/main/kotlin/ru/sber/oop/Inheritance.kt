@@ -10,12 +10,12 @@ open class Room(open val name: String, open val size: Int) {
 
     open fun load() = "Nothing much to see here... ${goblin.getSalutation()}"
 
-     constructor(name: String) : this(name, 100)
+    constructor(name: String) : this(name, 100)
 
 }
 
-class TownSquare(override val name: String, override val size: Int) : Room("TownSquare", 1000) {
+open class TownSquare : Room("TownSquare", 1000) {
     override val dangerLevel = super.dangerLevel - 3
 
-    override fun load() = "It's a square in a town"
+    final override fun load() = "It's a square in a town"
 }
