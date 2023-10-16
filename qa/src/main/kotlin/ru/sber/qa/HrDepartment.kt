@@ -3,7 +3,7 @@ package ru.sber.qa
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.util.LinkedList
+import java.util.*
 
 /**
  * Отдел кадров.
@@ -12,6 +12,7 @@ object HrDepartment {
     var clock = Clock.systemUTC()
     private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
     private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
+
 
     /**
      * Получение запроса на изготовление справки.
