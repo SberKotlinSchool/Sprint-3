@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
@@ -84,26 +85,13 @@ internal class HrDepartmentTest {
         assertEquals(certificateRequest, incomeBox.first)
     }
 
-    @ParameterizedTest
-    @EnumSource(value = DayOfWeek::class, names = ["MONDAY", "WEDNESDAY", "FRIDAY"])
-    fun shouldProcessNextRequestForNdfl(dayOfWeek: DayOfWeek) {
-        currentDayOfWeek returns dayOfWeek
+    @Suppress("UNCHECKED_CAST")
+    @Test
+    fun shouldProcessNextRequest() {
+        val incomeBox = getPrivateFields("incomeBox") as LinkedList<CertificateRequest>
+        incomeBox.clear()
+        incomeBox.add(certificateRequest)
         every { certificateRequest.process(1L) } returns certificate
-        every { certificateRequest.certificateType } returns CertificateType.NDFL
-        HrDepartment.receiveRequest(certificateRequest)
-        val outcomeOutcome = getPrivateFields("outcomeOutcome")
-        HrDepartment.processNextRequest(1L)
-        verify(exactly = 1) { certificateRequest.process(any()) }
-        assertEquals(certificate, outcomeOutcome.first)
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = DayOfWeek::class, names = ["TUESDAY", "THURSDAY"])
-    fun shouldProcessNextRequestForLabour(dayOfWeek: DayOfWeek) {
-        currentDayOfWeek returns dayOfWeek
-        every { certificateRequest.process(1L) } returns certificate
-        every { certificateRequest.certificateType } returns CertificateType.LABOUR_BOOK
-        HrDepartment.receiveRequest(certificateRequest)
         val outcomeOutcome = getPrivateFields("outcomeOutcome")
         HrDepartment.processNextRequest(1L)
         verify(exactly = 1) { certificateRequest.process(any()) }
