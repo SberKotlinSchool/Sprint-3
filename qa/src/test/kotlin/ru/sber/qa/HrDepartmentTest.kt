@@ -1,5 +1,7 @@
 package ru.sber.qa
 
+import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
@@ -71,4 +73,17 @@ internal class HrDepartmentTest {
         field.isAccessible = true
         return field.get(HrDepartment) as T
     }
+
+    @Test
+    fun `processNextRequest should handle request`() {
+        val certificateRequest = CertificateRequest(1, CertificateType.NDFL)
+        HrDepartment.clock = mockk()
+        val incomeBox = getPrivateFieldValue<List<CertificateRequest>>("incomeBox")
+        val outcomeOutcome = getPrivateFieldValue<List<CertificateRequest>>("outcomeOutcome")
+        every { certificateRequest.process(any()) } returns Certificate(certificateRequest, 1, byteArrayOf(1, 2, 3))
+        HrDepartment.processNextRequest(1)
+        assertEquals(0, incomeBox.size)
+        assertEquals(1, outcomeOutcome.size)
+    }
+
 }
