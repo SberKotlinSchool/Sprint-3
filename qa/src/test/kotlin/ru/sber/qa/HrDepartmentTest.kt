@@ -1,9 +1,6 @@
 package ru.sber.qa
 
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
+import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -76,7 +73,9 @@ internal class HrDepartmentTest {
         val certificateRequest = mockk<CertificateRequest>()
         val certificate = mockk<Certificate>()
         // Заполняем incomeBox мок-запросом
-        getPrivateFieldIncomeBoxValue("incomeBox").add(certificateRequest)
+        val income = getPrivateFieldIncomeBoxValue("incomeBox")
+        income.clear()
+        income.add(certificateRequest)
         // Устанавливаем поведение мок-объектов
         every { certificateRequest.process(any()) } returns certificate
         // Вызываем метод, который тестируем
@@ -91,8 +90,11 @@ internal class HrDepartmentTest {
         val certificateRequest = mockk<CertificateRequest>()
         val certificate = mockk<Certificate>()
         // Устанавливаем значение incomeBox
-        getPrivateFieldIncomeBoxValue("incomeBox").add(certificateRequest)
+        val income = getPrivateFieldIncomeBoxValue("incomeBox")
+        income.clear()
+        income.add(certificateRequest)
         val outcome = getPrivateFieldOutcomeValue("outcomeOutcome")
+        outcome.clear()
         // Мокируем вызовы методов
         every { certificateRequest.process(any()) } returns certificate
         // Вызываем метод processNextRequest
