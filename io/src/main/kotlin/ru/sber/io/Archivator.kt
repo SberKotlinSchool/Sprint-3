@@ -41,19 +41,19 @@ class Archivator {
         val outputFileName = "io/unzippedLogfile.log"
 
         try {
-            val zipInputStream = ZipInputStream(FileInputStream(inputArchiveName))
-            zipInputStream.use { zip ->
-                val inputStreamReader = InputStreamReader(zip)
-                inputStreamReader.useLines { lines ->
-                    FileWriter(outputFileName).use { writer ->
-                        lines.forEach { line ->
-                            writer.write(line + System.lineSeparator())
-                        }
-                    }
+            FileOutputStream(outputFileName).use { file ->
+                ZipInputStream(FileInputStream(inputArchiveName)).use { input ->
+                    if (input.nextEntry != null) input.copyTo(file)
                 }
             }
         } catch (t: Throwable) {
             t.printStackTrace()
         }
     }
+}
+
+fun main() {
+    val archivator = Archivator()
+    archivator.zipLogfile()
+    archivator.unzipLogfile()
 }
