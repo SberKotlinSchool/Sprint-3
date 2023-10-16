@@ -5,6 +5,7 @@ import io.mockk.mockkObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertContentEquals
 
 class CertificateRequestTest {
 
@@ -20,7 +21,9 @@ class CertificateRequestTest {
     @Test
     fun processTest() {
         val certificate = certificateRequest.process(321)
-        assertEquals(Certificate(certificateRequest, 321, "111".toByteArray()), certificate)
+        assertEquals(certificateRequest, certificate.certificateRequest)
+        assertContentEquals("111".toByteArray(), certificate.data)
+        assertEquals(321, certificate.processedBy)
     }
 
     @Test

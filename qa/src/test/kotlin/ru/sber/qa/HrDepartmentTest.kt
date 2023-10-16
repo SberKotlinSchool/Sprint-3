@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.*
+import java.util.*
 import kotlin.test.assertEquals
 
 class HrDepartmentTest {
@@ -23,7 +24,7 @@ class HrDepartmentTest {
     @Test
     fun receiveRequestTest() {
         HrDepartment.receiveRequest(certificateRequest)
-        assertEquals(1, HrDepartment.getIncomeBox().size)
+        assertEquals(1, getFieldValue("incomeBox").size)
     }
 
     @Test
@@ -34,6 +35,7 @@ class HrDepartmentTest {
             HrDepartment.receiveRequest(certificateRequest)
         }
     }
+
     @Test
     fun receiveRequestThrowsExceptionIfNotAllowed() {
         // понедельник недопустим для принятия справки по трудовой
@@ -45,8 +47,16 @@ class HrDepartmentTest {
 
     @Test
     fun processNextRequestTest() {
-        HrDepartment.receiveRequest(certificateRequest)
+        val list: LinkedList<CertificateRequest> = getFieldValue("incomeBox") as LinkedList<CertificateRequest>
+        list.clear()
+        list.add(certificateRequest)
         HrDepartment.processNextRequest(1)
-        assertEquals(1, HrDepartment.getOutcomeOutcome().size)
+        assertEquals(1, getFieldValue("outcomeOutcome").size)
+    }
+
+    private fun getFieldValue(fieldName: String): LinkedList<*> {
+        val field = HrDepartment.javaClass.getDeclaredField(fieldName)
+        field.isAccessible = true
+        return field.get(fieldName) as LinkedList<*>
     }
 }
