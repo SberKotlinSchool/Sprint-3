@@ -1,7 +1,6 @@
 package ru.sber.oop
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class DataClassesTest {
@@ -39,6 +38,22 @@ internal class DataClassesTest {
         assertFalse(user1 == user3)
 
     }
+
+    @Test
+    fun `equals and hashCode`() {
+        val u1 = User("user", 10)
+        u1.city = "Moscow"
+        val u2 = User("user", 10)
+        u2.city = "Moscow"
+
+        assertTrue(u1 == u2)
+        assertTrue(u1.hashCode() == u2.hashCode())
+
+        u2.city = "London"
+        assertFalse(u1 == u2)
+        assertFalse(u1.hashCode() == u2.hashCode())
+    }
+
 
 
 }

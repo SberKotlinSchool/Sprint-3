@@ -14,6 +14,6 @@ data class User(val name: String, val age: Long) {
     }
 
     override fun hashCode(): Int {
-        return super.hashCode() + city.hashCode()
+        return name.hashCode() + age.hashCode() + city.hashCode()
     }
 }
