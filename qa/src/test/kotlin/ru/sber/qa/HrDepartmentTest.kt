@@ -1,6 +1,9 @@
 package ru.sber.qa
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +33,7 @@ internal class HrDepartmentTest {
 
         HrDepartment.receiveRequest(certificateRequest)
 
-        val incomeBox = getPrivateFieldIncomeBoxValue("incomeBox")
+        val incomeBox: LinkedList<CertificateRequest> = getPrivateFieldValue("incomeBox")
         assertTrue(incomeBox.contains(certificateRequest))
     }
 
@@ -41,7 +44,7 @@ internal class HrDepartmentTest {
 
         HrDepartment.receiveRequest(certificateRequest)
 
-        val incomeBox = getPrivateFieldIncomeBoxValue("incomeBox")
+        val incomeBox: LinkedList<CertificateRequest> = getPrivateFieldValue("incomeBox")
         assertTrue(incomeBox.contains(certificateRequest))
     }
 
@@ -73,15 +76,17 @@ internal class HrDepartmentTest {
         val certificateRequest = mockk<CertificateRequest>()
         val certificate = mockk<Certificate>()
         // Заполняем incomeBox мок-запросом
-        val income = getPrivateFieldIncomeBoxValue("incomeBox")
+        val income: LinkedList<CertificateRequest> = getPrivateFieldValue("incomeBox")
         income.clear()
         income.add(certificateRequest)
         // Устанавливаем поведение мок-объектов
         every { certificateRequest.process(any()) } returns certificate
+        val outcome: LinkedList<Certificate> = getPrivateFieldValue("outcomeOutcome")
+
         // Вызываем метод, который тестируем
         HrDepartment.processNextRequest(123L)
         // Проверяем, что outcomeOutcome содержит ожидаемый Certificate
-        assertEquals(certificate, getPrivateFieldOutcomeValue("outcomeOutcome").first())
+        assertEquals(certificate, outcome.first())
     }
 
     @Test
@@ -90,10 +95,10 @@ internal class HrDepartmentTest {
         val certificateRequest = mockk<CertificateRequest>()
         val certificate = mockk<Certificate>()
         // Устанавливаем значение incomeBox
-        val income = getPrivateFieldIncomeBoxValue("incomeBox")
+        val income: LinkedList<CertificateRequest> = getPrivateFieldValue("incomeBox")
         income.clear()
         income.add(certificateRequest)
-        val outcome = getPrivateFieldOutcomeValue("outcomeOutcome")
+        val outcome: LinkedList<Certificate> = getPrivateFieldValue("outcomeOutcome")
         outcome.clear()
         // Мокируем вызовы методов
         every { certificateRequest.process(any()) } returns certificate
@@ -103,15 +108,9 @@ internal class HrDepartmentTest {
         assertEquals(1, outcome.size)
     }
 
-    private fun getPrivateFieldIncomeBoxValue(fieldName: String): LinkedList<CertificateRequest>  {
+    private fun <T> getPrivateFieldValue(fieldName: String): T {
         val field = HrDepartment::class.java.getDeclaredField(fieldName)
         field.isAccessible = true
-        return field.get(HrDepartment) as LinkedList<CertificateRequest>
-    }
-
-    private fun getPrivateFieldOutcomeValue(fieldName: String): LinkedList<Certificate>  {
-        val field = HrDepartment::class.java.getDeclaredField(fieldName)
-        field.isAccessible = true
-        return field.get(HrDepartment) as LinkedList<Certificate>
+        return field.get(HrDepartment) as T
     }
 }
