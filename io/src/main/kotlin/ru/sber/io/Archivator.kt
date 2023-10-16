@@ -42,9 +42,3 @@ class Archivator {
         }
     }
 }
-
-fun main() {
-    val arch = Archivator()
-    arch.zipLogfile()
-    arch.unzipLogfile()
-}
