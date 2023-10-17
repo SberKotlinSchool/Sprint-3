@@ -80,7 +80,7 @@ class HrDepartmentTest {
     }
 
     @Test
-    fun shouldBeEmptyInOutcome() {
+    fun shouldNotBeEmptyInOutcome() {
         mockkObject(Random)
         every { Random.nextLong(5000L, 15000L) } returns Scanner.SCAN_TIMEOUT_THRESHOLD - 1000L
 
