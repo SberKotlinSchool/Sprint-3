@@ -26,8 +26,8 @@ class Grep {
             .asStream()
             .filter { file -> file.isFile }
             .forEach {
-                it.readLines().forEach { line ->
-                    if (line.contains(subString)) output.appendText("$line\n")
+                it.readLines().forEachIndexed { index, line ->
+                    if (line.contains(subString)) output.appendText("${it.name} : ${index + 1} : $line\n")
                 }
             }
     }
@@ -35,5 +35,5 @@ class Grep {
 
 fun main() {
     val grep = Grep()
-    grep.find("192.168.1.1")
+    grep.find("22/Jan/2001:14:27:46")
 }
