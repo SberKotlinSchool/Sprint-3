@@ -12,7 +12,6 @@ object HrDepartment {
     var clock = Clock.systemUTC()
     private val incomeBox: LinkedList<CertificateRequest> = LinkedList()
     private val outcomeOutcome: LinkedList<Certificate> = LinkedList()
-
     /**
      * Получение запроса на изготовление справки.
      *
