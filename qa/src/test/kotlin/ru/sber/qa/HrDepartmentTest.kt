@@ -15,10 +15,12 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.EnumSource
-import org.junit.jupiter.params.provider.MethodSource
 
 @ExtendWith(MockKExtension::class)
 class HrDepartmentTest {
@@ -27,18 +29,19 @@ class HrDepartmentTest {
         private val certificateRequestMock = mockk<CertificateRequest>()
 
         @JvmStatic
-        private fun provideNotAllowReceiveRequestExceptionData(): Stream<Arguments> = Stream.of(
-            Arguments.of(CertificateType.NDFL, DayOfWeek.MONDAY),
-            Arguments.of(CertificateType.NDFL, DayOfWeek.WEDNESDAY),
-            Arguments.of(CertificateType.NDFL, DayOfWeek.FRIDAY),
-            Arguments.of(CertificateType.LABOUR_BOOK, DayOfWeek.TUESDAY),
-            Arguments.of(CertificateType.LABOUR_BOOK, DayOfWeek.THURSDAY)
-        )
-
-        @JvmStatic
         @AfterAll
         fun afterTest() {
             unmockkAll()
+        }
+
+        private class NotAllowReceiveRequestExceptionTestDataProvider: ArgumentsProvider {
+            override fun provideArguments(p0: ExtensionContext?): Stream<out Arguments> = Stream.of(
+                Arguments.of(CertificateType.NDFL, DayOfWeek.MONDAY),
+                Arguments.of(CertificateType.NDFL, DayOfWeek.WEDNESDAY),
+                Arguments.of(CertificateType.NDFL, DayOfWeek.FRIDAY),
+                Arguments.of(CertificateType.LABOUR_BOOK, DayOfWeek.TUESDAY),
+                Arguments.of(CertificateType.LABOUR_BOOK, DayOfWeek.THURSDAY)
+            )
         }
     }
 
@@ -62,7 +65,7 @@ class HrDepartmentTest {
     }
 
     @ParameterizedTest
-    @MethodSource("ru.sber.qa.HrDepartmentTest#provideNotAllowReceiveRequestExceptionData")
+    @ArgumentsSource(NotAllowReceiveRequestExceptionTestDataProvider::class)
     fun testReceiveRequestSuccess(certificateType: CertificateType, dayOfWeek: DayOfWeek) {
         prepareDate(dayOfWeek)
         assertDoesNotThrow { HrDepartment.receiveRequest(CertificateRequest(1, certificateType)) }
