@@ -1,13 +1,24 @@
 package ru.sber.oop
 
-class Room(val name: String, val size: Int) {
+open class Room(
+    val name: String,
+    val size: Int,
+    val monster: Monster = Goblin("Valera", "Green", "Super", 100)) {
 
-    val dangerLevel = 5
+    protected open val dangerLevel = 5
 
     fun description() = "Room: $name"
 
-    fun load() = "Nothing much to see here..."
+    open fun load() = monster.getSalutation()
+
+    constructor(name: String) : this(
+        name,
+        100
+    )
 
 }
 
-//TODO: create class TownSquare here...
+class TownSquare : Room("Town Square", 1000) {
+    final override fun load() = "loading..."
+    override val dangerLevel = super.dangerLevel - 3
+}
