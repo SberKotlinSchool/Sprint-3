@@ -2,6 +2,7 @@ package ru.sber.nio
 
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Paths
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.useLines
@@ -22,21 +23,25 @@ class Grep {
      */
     fun find(subString: String) {
         val result = File("io/result.txt")
-        val logsPath = Paths.get("io/logs/")
-        result.bufferedWriter()
-            .use { bufferedWriter ->
-                Files.walk(logsPath)
-                    .filter { file -> file.isRegularFile() }
-                    .forEach { file ->
-                        file
-                            .useLines { lines ->
-                                lines.withIndex()
-                                    .filter { (_, line) -> line.contains(subString, true) }
-                                    .map { (i, line) -> "${file.fileName} : ${i + 1} : $line\n" }
-                                    .forEach { bufferedWriter.write(it) }
-                            }
-                    }
-            }
+        val logsPath = Paths.get("io/logs2/")
+        try {
+            result.bufferedWriter()
+                .use { bufferedWriter ->
+                    Files.walk(logsPath)
+                        .filter { file -> file.isRegularFile() }
+                        .forEach { file ->
+                            file
+                                .useLines { lines ->
+                                    lines.withIndex()
+                                        .filter { (_, line) -> line.contains(subString, true) }
+                                        .map { (i, line) -> "${file.fileName} : ${i + 1} : $line\n" }
+                                        .forEach { bufferedWriter.write(it) }
+                                }
+                        }
+                }
+        } catch (e: NoSuchFileException) {
+            println(e)
+        }
     }
 }
 

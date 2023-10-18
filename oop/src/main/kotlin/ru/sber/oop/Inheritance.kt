@@ -14,7 +14,7 @@ open class Room(val name: String, val size: Int) {
     private fun Monster.getSalutation() = "Die, human! I'm ${monster.name}!"
 }
 
-class TownSquare(name: String = "Town Square", size: Int = 1000) : Room(name, size) {
+open class TownSquare(name: String = "Town Square", size: Int = 1000) : Room(name, size) {
 
     public override val dangerLevel: Int
         get() = super.dangerLevel - 3
