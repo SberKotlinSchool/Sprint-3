@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 import java.util.stream.Stream
 import kotlin.test.assertFailsWith
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,6 +28,13 @@ class HrDepartmentTest {
     companion object {
         private val mockClock = mockk<Clock>()
         private val certificateRequestMock = mockk<CertificateRequest>()
+
+        @JvmStatic
+        @BeforeAll
+        fun beforeAll() {
+            every { certificateRequestMock.employeeNumber } returns 1
+            every { certificateRequestMock.certificateType } returns CertificateType.NDFL
+        }
 
         @JvmStatic
         @AfterAll
@@ -50,7 +58,7 @@ class HrDepartmentTest {
     fun testReceiveRequestWeekendException(dayOfWeek: DayOfWeek) {
         prepareDate(dayOfWeek)
         assertFailsWith<WeekendDayException> {
-            HrDepartment.receiveRequest(CertificateRequest(1, CertificateType.LABOUR_BOOK))
+            HrDepartment.receiveRequest(certificateRequestMock)
         }
         verify { LocalDateTime.now(mockClock) }
     }
@@ -68,7 +76,8 @@ class HrDepartmentTest {
     @ArgumentsSource(NotAllowReceiveRequestExceptionTestDataProvider::class)
     fun testReceiveRequestSuccess(certificateType: CertificateType, dayOfWeek: DayOfWeek) {
         prepareDate(dayOfWeek)
-        assertDoesNotThrow { HrDepartment.receiveRequest(CertificateRequest(1, certificateType)) }
+        every { certificateRequestMock.certificateType } returns certificateType
+        assertDoesNotThrow { HrDepartment.receiveRequest(certificateRequestMock) }
         verify { LocalDateTime.now(mockClock) }
     }
 
@@ -89,7 +98,6 @@ class HrDepartmentTest {
         every { certificateRequestMock.process(1) } returns Certificate(
             certificateRequestMock, 1, byteArrayOf()
         )
-        HrDepartment.receiveRequest(certificateRequestMock)
         HrDepartment.processNextRequest(1)
         verify { certificateRequestMock.process(1) }
     }
