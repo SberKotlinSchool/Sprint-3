@@ -55,7 +55,6 @@ class HrDepartmentTest {
 
     @Test
     fun testProcessNextRequest() {
-        HrDepartment.receiveRequest(certificateRequest)
         every { certificateRequest.process(any()) } returns mockk()
         HrDepartment.processNextRequest(1L)
         verify { certificateRequest.process(1L) }
