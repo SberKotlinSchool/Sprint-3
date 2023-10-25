@@ -18,7 +18,7 @@ class Player(override val powerType: String, override var healthPoints: Int, val
 
         if (isBlessed) fullDamageRoll += damageRoll
 
-        opponent.healthPoints - fullDamageRoll
+        opponent.healthPoints -= fullDamageRoll
         return fullDamageRoll
     }
 
@@ -28,7 +28,7 @@ abstract class Monster(open val name: String, open val description: String) : Fi
     override fun attack(opponent: Fightable): Int {
         var fullDamageRoll: Int = damageRoll
 
-        opponent.healthPoints - fullDamageRoll
+        opponent.healthPoints -= fullDamageRoll
         return fullDamageRoll
     }
 }
